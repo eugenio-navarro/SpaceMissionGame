@@ -6,7 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/CentroEspacial.unity
+    guid: 16801c34db8b7a04592746096700f25a
+  - enabled: 1
+    path: Assets/Scenes/Hangar.unity
+    guid: 5c6a49d20c8437c43996ebf5ef832be5
+  - enabled: 1
+    path: Assets/Scenes/Lanzamiento.unity
+    guid: ac6a1da8a93675b478978d158aa4d2cc
+  - enabled: 1
+    path: Assets/Scenes/Resultados.unity
+    guid: 889e959acab98b145a1af3754ae3ee03
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
