@@ -364,6 +364,14 @@ REFERENCES.md
 
 ## 9. Forma de trabajo y Git
 
+### Enfoque iterativo
+
+El contenido detallado de cada escena **no está cerrado de antemano**: se define y ajusta **a medida que se crean las escenas**, partiendo del diseño de este README y del `Moodboard.pdf`. Las dudas se resuelven en el proceso.
+
+- Cada uno avanza en paralelo con sus escenas.
+- `MissionState` y los datos compartidos **crecen a medida que hacen falta**: quien necesita un campo nuevo lo agrega, avisa y pushea enseguida.
+- Cuando algo del diseño cambia, se actualiza este README.
+
 ### Reparto por escenas (regla anti-conflictos)
 
 **Nunca editen los dos la misma escena.**
