@@ -16,7 +16,11 @@ public static class HubUIBuilder
         var title = UIFactory.Card("TitleCard", root, Palette.Orange);
         UIFactory.Pin(title, new Vector2(0f, 1f), new Vector2(M, -M), new Vector2(520f, 112f));
         Caption(title, "Space Center");
+<<<<<<< HEAD
         var name = UIFactory.Label("Title", title, UILayout.GameTitle, 30, Palette.TextMain, FontKind.Title);
+=======
+        var name = UIFactory.Label("Title", title, "Mission Control: Build to Launch", 29, Palette.TextMain, FontKind.Title);
+>>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a
         UIFactory.Place(name.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 12f), new Vector2(-20f, -44f));
         UIFactory.Appear(title.gameObject);
 

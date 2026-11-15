@@ -1,6 +1,6 @@
 # References
 
-Proyecto: **Space Mission Design Game** · NASA Space Apps Challenge 2026
+Proyecto: **Mission Control: Build to Launch** (challenge "Space Mission Design Game") · NASA Space Apps Challenge 2026
 Motor: Unity 6.6 (6000.6.9f1) · URP
 
 > Regla del equipo: cada asset que se baja se anota acá **en el momento**, con link y licencia.
@@ -57,16 +57,21 @@ Motor: Unity 6.6 (6000.6.9f1) · URP
 
 | Usado | Asset | Autor | Licencia | Uso en el juego | Link |
 |---|---|---|---|---|---|
-| [x] | Chakra Petch (SemiBold, Bold) | Cadson Demak | SIL OFL 1.1 | Textos y títulos del HUD de lanzamiento | https://fonts.google.com/specimen/Chakra+Petch |
-| [x] | Share Tech Mono | Carrois Apostrophe | SIL OFL 1.1 | Números del reloj y el altímetro | https://fonts.google.com/specimen/Share+Tech+Mono |
+| [x] | Chakra Petch (SemiBold, Bold) | Cadson Demak | SIL OFL 1.1 | Textos y títulos de toda la interfaz | https://fonts.google.com/specimen/Chakra+Petch |
+| [x] | Share Tech Mono | Carrois Apostrophe | SIL OFL 1.1 | Números (reloj, altímetro, barras y puntajes) | https://fonts.google.com/specimen/Share+Tech+Mono |
 
 ## Paquetes de Unity
 
 | Paquete | Uso |
 |---|---|
-| Cinemachine | Cámaras del hangar y del lanzamiento |
-| Timeline | Secuencia del lanzamiento |
-| TextMeshPro / uGUI | Interfaz |
+| Universal Render Pipeline (URP) | Render del juego |
+| uGUI (Text común) | Toda la interfaz |
+| Input System | Mouse y teclado |
+| Cinemachine / Timeline | Instalados, pero no se usan: las cámaras y el lanzamiento se animan con código propio |
+
+## Música y sonidos
+
+Generados por código en el juego (`Assets/Scripts/Core/SoundBank.cs`): no se usa ningún archivo de audio de terceros.
 
 ## Inspiración de diseño (sin assets usados)
 
@@ -74,7 +79,10 @@ Motor: Unity 6.6 (6000.6.9f1) · URP
 
 ## Herramientas de IA
 
-- **Claude (Anthropic):** investigación del challenge, planificación del diseño del juego y asistencia con código. *(Completar con el uso real antes de entregar.)*
+- **Claude (Anthropic), con Claude Code y el plugin oficial de Unity:** investigación del challenge y de las fuentes de NASA, planificación del diseño, escritura de gran parte del código C# y de los constructores de escenas, textos del juego en inglés, verificación de datos reales contra las fuentes citadas y pruebas automatizadas en el editor.
+- **Revisión humana:** el equipo definió el juego, tomó las decisiones de diseño, revisó cada cambio y probó el juego.
+- **Imágenes y audio:** no se usaron imágenes ni videos generados por IA. La música y los sonidos se generan con código (escrito con asistencia de IA).
+- **Modelos 3D, texturas y fuentes:** son de terceros (ver arriba), no generados por IA.
 
 ---
 
@@ -83,6 +91,7 @@ Motor: Unity 6.6 (6000.6.9f1) · URP
 - Textures by **Solar System Scope** — https://www.solarsystemscope.com/textures/ — licensed under CC BY 4.0.
 - 3D assets by **Kenney** (www.kenney.nl) — CC0.
 
+<<<<<<< HEAD
 ## Mission Control: Build to Launch events
 
 - NASA radar through clouds https://svs.gsfc.nasa.gov/5661
@@ -90,3 +99,8 @@ Motor: Unity 6.6 (6000.6.9f1) · URP
 - NASA storm atmospheric drag https://svs.gsfc.nasa.gov/5193/
 
 Probabilities, loss fractions and equipment statistics are simplified game values. The storm power rule is an abstraction; the historical Starlink case involved atmospheric drag.
+=======
+## Publication and delivery assistance
+
+- **ChatGPT (OpenAI):** itch.io publication configuration, responsive WebGL HTML/CSS wrapper, repository documentation, submission text. The official project demonstration is the team-supplied MissionControl_Demo.mp4 (29.4 seconds, 1920 x 1080), copied unchanged. ChatGPT did not generate or edit this video. Its language and content credits require team review before submission.
+>>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a

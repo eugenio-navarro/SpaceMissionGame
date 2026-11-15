@@ -1,145 +1,119 @@
 # Mission Control: Build to Launch
 
-Juego 3D en Unity para el **NASA Space Apps Challenge 2026**, challenge **"Space Mission Design Game"**.
+**Design a satellite mission, launch it, and learn why it worked.**
 
-El jugador planifica una misión espacial en un centro espacial, arma un satélite pieza por pieza con recursos limitados, lo lanza y ve por qué la misión funcionó o falló. Se inspira en *Kerbal Space Program*, pero **sin pilotaje ni física real**: lo central son las decisiones de diseño y sus consecuencias.
+A free 3D browser game by **Hell0 World!**, created for **NASA Space Apps Challenge 2026**, challenge **Space Mission Design Game**, Buenos Aires.
 
-> Este README es la fuente única de verdad del proyecto. Está escrito para personas **y** para asistentes de IA (Claude Code, etc.). Si algo cambia, se actualiza acá.
+## Play now
 
----
+**[Play in your browser](https://eugenio-navarro.itch.io/mission-control-build-to-launch)**
 
-## Índice
+No installation or account required. Use a desktop browser with a mouse and keyboard, click **Run game**, and let Unity load. Use fullscreen for a larger view. The game interface is in English.
 
-1. [Datos clave y fechas](#1-datos-clave-y-fechas)
-2. [El challenge de la NASA](#2-el-challenge-de-la-nasa)
-3. [Diseño del juego](#3-diseño-del-juego)
-4. [Modelo de datos y fórmulas](#4-modelo-de-datos-y-fórmulas)
-5. [Valor educativo](#5-valor-educativo)
-6. [Alcance y prioridades](#6-alcance-y-prioridades)
-7. [Estilo visual](#7-estilo-visual)
-8. [Stack técnico y arquitectura](#8-stack-técnico-y-arquitectura)
-9. [Forma de trabajo y Git](#9-forma-de-trabajo-y-git)
-10. [Assets y licencias](#10-assets-y-licencias)
-11. [Build y entrega](#11-build-y-entrega)
-12. [Contexto para asistentes de IA](#12-contexto-para-asistentes-de-ia)
-13. [Pendientes y decisiones abiertas](#13-pendientes-y-decisiones-abiertas)
+[Watch the official demo (29.4 seconds)](https://github.com/eugenio-navarro/SpaceMissionGame/raw/refs/heads/main/docs/submission/MissionControl_Demo.mp4)
 
----
+![Main menu](docs/images/cover_menu.png)
 
-## 1. Datos clave y fechas
+## The game
 
-| Qué | Dato |
-|---|---|
-| Evento | NASA Space Apps Challenge 2026 — hackathon de 48 h |
-| Fechas | Sábado 14 y domingo 15 de noviembre de 2026 |
-| **Cierre de entrega en la plataforma** | **Domingo 15/11, 23:59 hora argentina** |
-| Local Event | Buenos Aires (Universidad de Palermo, híbrido) |
-| Presentaciones al jurado (evento BA) | Domingo 15/11 desde las **15:00** (confirmar con emprende@palermo.edu) |
-| Premiación local | Jueves 19/11, 17:00, presencial |
-| Equipo | 2 personas |
-| Motor | **Unity 6.6 — 6000.6.9f1** (los dos con la misma versión exacta) |
-| Repo | GitHub privado `eugenio-navarro/SpaceMissionGame` (Git + LFS) |
+You run a satellite mission from a 3D space center. Accept a contract, assemble a spacecraft, choose its rocket and orbit, review the equipment list, and launch. Your goal is to bring enough useful science back to Earth within the mission budget.
 
-**Regla de oro de tiempos:** el juego tiene que estar jugable y subido **antes de las 15:00 del domingo**. Lo que se agregue después es bonus.
+Every part affects mass, electricity, data transmission and cost. A better camera is useful only if your satellite can power it and send its data home. Live resource bars show the consequences of each selection.
 
----
+After launch, the game explains the outcome, suggests a change, compares your spacecraft with a real mission, and records the flight for you to review.
 
-## 2. El challenge de la NASA
+## Your first mission
 
-### Qué pide (resumen)
+1. Select **Cadet** for a starter design, or **Engineer** to build from scratch. Keep **Tutorial: ON** and **Free Mode: OFF** for a guided campaign.
+2. Press **Play**, click **Mission Control**, and accept **Landsat: Earth Watch**.
+3. Enter the **Assembly Hangar**. Hover over a part to read its description; click to add or remove it.
+4. Use the four tabs to select your equipment. Watch **mass, power, data, cost, science and risk** on the right.
+5. Resolve the blocking alerts. Press **Launch** to review the equipment list and orbit map, then confirm the flight.
+6. During ascent, press **Space** or click the separation prompt when the marker reaches the green zone. The flight computer separates automatically if you do not intervene.
+7. Read the result and its explanation. Choose **Redesign** to improve the previous spacecraft, or return to the space center and open the **Mission Archive**.
 
-Crear un **juego interactivo** donde el jugador **diseñe, gestione y simule una misión espacial completa**, tome decisiones de ingeniería, administre **recursos limitados** y vea cómo cada decisión afecta el éxito de la misión.
+| Hangar tab | What you choose |
+| --- | --- |
+| Science | Up to three instruments: basic camera, advanced camera, spectrometer, radar |
+| Power | Small or large solar panel and an optional battery |
+| Rocket | Small, medium or large rocket and an orbit allowed by the contract |
+| Comms | Small or large antenna and one to four ground stations |
 
-Idea central: **no hay una solución perfecta**. Un instrumento mejor da más ciencia, pero también suma masa, energía, costo y datos.
+### A design to try
 
-### Requisitos centrales (los cubrimos sí o sí)
+For **Landsat: Earth Watch** on **Engineer**, choose an **advanced camera, large solar panel, battery, large antenna, small rocket, low orbit, and two ground stations**.
 
-- Definir el **objetivo** de la misión y sus **requisitos**.
-- Diseñar la **nave** y elegir **instrumentos**.
-- Elegir **lanzador** y **órbita**, con chequeo de compatibilidad masa/órbita/cohete.
-- Administrar recursos: **presupuesto, masa, energía, datos, comunicaciones, vida útil**.
-- **Simular** la misión y **evaluarla**.
-- Dar **feedback que explique por qué** salió bien o mal, no solo "correcto o incorrecto".
+Before events, this design costs **$203M**, weighs **365 kg** against **500 kg** of capacity, uses **160 W** against **250 W** generated, and returns an estimated **60 science**, matching the goal. Random events and component failure can still change the final result. Try adding a third ground station and compare the communications performance.
 
-### Opcionales que menciona la NASA ("may", "could")
+## Contracts
 
-Modo equipo de hasta 4, roles, dificultades, escenarios múltiples, eventos aleatorios, ranking, reporte final, sandbox, guardar y comparar diseños, análisis post-misión.
+Complete a campaign contract successfully to unlock the next. A partial result does not unlock it. These are the standard **Engineer** budgets.
 
-### Base real usada (fuentes NASA)
+| Contract | Objective | Science goal | Budget | Available orbits |
+| --- | --- | ---: | ---: | --- |
+| Landsat: Earth Watch | Track changes in forests and ice | 60 | $300M | Low Earth, geostationary |
+| Hubble: Deep Field | Study faraway galaxies | 70 | $400M | Low Earth, geostationary |
+| LRO: Lunar Mapping | Map the lunar south pole | 40 | $500M | Lunar |
 
-- **Design and Develop Science Missions (NASA):** fases de una misión (*necesidad → objetivos → requisitos → diseño → construcción y verificación → operación*) y los **4 segmentos**:
-  - **Lanzamiento:** el cohete.
-  - **Espacial:** la nave y los instrumentos.
-  - **Terrestre:** las antenas y el control en Tierra.
-  - **Usuario:** los científicos que usan los datos.
-  - Principio clave: **"empezar con el final en mente"**.
-- **Mission Design Lab (NASA Goddard):** *trade studies* (comparar alternativas), **MEL** (lista de equipos con masa, potencia y costo), **margen y riesgo**.
-- **Build It Yourself: Satellite! (juego NASA/Webb):** opciones en gris cuando son incompatibles, niveles de dificultad y comparación del resultado con **misiones reales**.
+Radar is unavailable in the Hubble contract. Other parts remain selectable subject to contract restrictions.
 
-### Requisitos de la entrega
+## Difficulty and Free Mode
 
-- Todo en **inglés** (texto de la entrega y materiales). Si el video está en español, necesita **subtítulos en inglés**.
-- Todos los miembros registrados en el equipo **antes** del cierre.
-- Listar **todos los recursos externos** en *References* (ver `REFERENCES.md`).
-- Declarar que el trabajo es original.
+| Difficulty | Budget | Failure risk | Starting design |
+| --- | --- | --- | --- |
+| Cadet | 25% more, rounded to $5M increments | Half standard risk, rounded to a whole percent with a 1% minimum | A launchable starter design to improve toward the science goal |
+| Engineer | Standard | Standard | Build from scratch unless a saved design exists |
+| Flight Director | 15% less, rounded to $5M increments | 1.5 times standard risk | Build from scratch unless a saved design exists |
 
----
+Change difficulty and **Free Mode** in the main menu. Free Mode opens all three contracts and removes the budget limit. Mass, power and contract restrictions still apply. Free flights appear in the flight log, but do not unlock campaign contracts or enter the campaign ranking.
 
-## 3. Diseño del juego
+## Mission rules
 
-### Concepto
+The science score depends on the data that actually reaches Earth and the contract's detail factor for the selected orbit.
 
-Juego **3D** con estética y estructura inspiradas en *Kerbal Space Program*: centro espacial → hangar → lanzamiento → resultados. El lanzamiento es **automático y animado**: el jugador no pilotea.
+- **Mass:** the satellite must fit its rocket's payload capacity. More demanding orbits reduce how much the rocket can carry.
+- **Power:** the panel must cover consumption. Without a battery in an orbit with eclipses, average generation drops to 65%.
+- **Communications:** the antenna, orbit contact and ground stations limit the data received on Earth.
+- **Budget:** the spacecraft, rocket and ground stations must fit the contract allowance in campaign mode.
+- **Margins:** spare power and payload capacity reduce component failure risk.
 
-### Flujo general
+The preflight **Master Equipment List (MEL)** shows equipment mass, power and cost, plus margins, risk and an orbit map. A launchable design can still fall short of the science goal. Read warnings as well as blocking alerts.
 
-```
-CENTRO ESPACIAL (menú principal, vista aérea 3D)
- ├─ [1] Control de misión ──► elegir contrato (nivel)
- ├─ [2] Hangar ─────────────► ARMADO del satélite + cohete + órbita
- ├─ [3] Antenas ────────────► estaciones en Tierra + vista de mapa
- └─ [4] Cúpula ─────────────► archivo de misiones, resultados, desbloqueos
-            │
-            ▼  (botón LANZAR en el hangar)
-      LANZAMIENTO (automático) ──► RESULTADOS ──► vuelve al CENTRO ESPACIAL
-```
+Each flight encounters a **solar storm**, **ground station interference**, or **calm conditions**. A power margin of at least **20%** protects against the game's storm effect. At least **three ground stations** protect against the interference penalty. A separate risk roll can cause a component failure and halve the science result.
 
-### Las 4 etapas
+| Result | Final science |
+| --- | --- |
+| Success | At least 100% of the goal |
+| Partial | At least 60%, but below 100% |
+| Failed | Below 60% |
 
-| # | Etapa | Escena | Qué hace el jugador | Base NASA |
-|---|---|---|---|---|
-| 1 | **Misión** | `CentroEspacial` | Elige un contrato: objetivo, meta de ciencia, presupuesto y recompensa | Necesidad, objetivos y requisitos |
-| 2 | **Armado** | `Hangar` | Elige piezas en 4 pestañas y ve el HUD de recursos en vivo. El botón Lanzar se bloquea si algo no cierra | Segmentos espacial, de lanzamiento y terrestre; verificación (MEL, riesgo) |
-| 3 | **Lanzamiento** | `Lanzamiento` | Mira el despegue, la separación de etapas, la llegada a órbita, la vista de mapa y un evento aleatorio | Operación |
-| 4 | **Resultados** | `Resultados` | Ve el puntaje, la explicación de por qué salió así, una sugerencia de qué probar y una misión real parecida | Segmento de usuario y trade study |
+Results explain what happened and what to try next. A trade study checks launchable single-change alternatives for more estimated science or equal science with less risk. Real-mission comparisons include **Landsat 9, Hubble, LRO and SAOCOM**.
 
-### Pestañas del hangar (= roles en modo equipo)
+## Mission Archive and saved progress
 
-| Pestaña | Rol | Qué se elige |
-|---|---|---|
-| Instrumentos | Científico | Hasta 3 instrumentos |
-| Energía | Ingeniero | 1 panel solar y batería opcional |
-| Cohete y órbita | Lanzamiento | 1 cohete y 1 órbita |
-| Comunicaciones | Comunicaciones | 1 antena y de 1 a 4 estaciones en Tierra |
+Open the glass dome in the space center to review flights. The log keeps the **latest 30 flights**, including selected parts, difficulty, result, event, margins, what went well, what went wrong and the lesson.
 
-> Las estaciones en Tierra se eligen en la pestaña Comunicaciones. El edificio de antenas del centro espacial abre ese mismo panel más la vista de mapa (opcional si sobra tiempo).
+Campaign rankings retain the **top five scores per contract**. Ranking score is `science * 10 + unused budget in $M`.
 
-### Modalidades
+The game saves designs, campaign progress, tutorials, flight history and settings locally through Unity **PlayerPrefs**. Progress belongs to the browser/device used to play and can be lost if site data is cleared. There are no cloud saves or shared online leaderboards. **New Game** resets progress and keeps music and effects volume settings.
 
-- **Campaña:** 3 contratos/niveles en orden (Tierra → Telescopio → Luna). Al pasar uno se desbloquean piezas.
-- **Equipo:** de 2 a 4 jugadores por turnos en la misma PC. Cada pestaña del hangar es un rol y todos comparten presupuesto. **No es online.**
-- **Libre:** sin límite de presupuesto, para experimentar.
+## Controls
 
-### Contratos (escenarios)
+| Input | Action |
+| --- | --- |
+| Mouse click | Select buildings, parts and interface controls |
+| Mouse hover | Read part descriptions and menu hints |
+| Drag with left or right mouse button outside the UI | Orbit the hangar camera |
+| Mouse wheel outside the UI | Zoom in the hangar |
+| Esc | Close a scene panel or open the menu; the browser may use the first press to leave fullscreen |
+| Space or click the separation prompt | Separate the first rocket stage during the timing challenge |
+| Enter or the skip button | Skip the launch sequence |
 
-| Nivel | Contrato | Objetivo | Meta de ciencia | Presupuesto | Órbitas permitidas | Instrumentos bloqueados | Misión real parecida |
-|---|---|---|---|---|---|---|---|
-| 1 | Observar la Tierra | Medir cambios en bosques y hielo | 60 | $300M | Baja, Geoestacionaria | — | Landsat |
-| 2 | Telescopio espacial | Estudiar galaxias lejanas | 70 | $400M | Baja, Geoestacionaria | Radar | Hubble |
-| 3 | Explorar la Luna | Mapear el polo sur lunar | 40 | $500M | Lunar | — | Lunar Reconnaissance Orbiter |
+**How to Play / Mission Guide** explains the concepts. **Options** includes separate music and effects volume controls and access to the guide and credits.
 
-### Eventos de la simulación
+## Screenshots
 
+<<<<<<< HEAD
 Cada evento elegible se sortea de forma independiente y pueden coincidir varios. Las probabilidades son valores de balance de la simulación.
 
 - **Tormenta solar:** si el margen de energía es menor al 20%, se apaga el instrumento que más consume. Si no, el margen lo protege.
@@ -149,30 +123,42 @@ Cada evento elegible se sortea de forma independiente y pueden coincidir varios.
 - **Calma:** ningún evento ocurrió. Tormenta e interferencia tienen 15% de probabilidad cada una.
 
 La tablet **Mission Forecast** del hangar muestra probabilidades, coincidencias y ciencia estimada usando las mismas reglas del vuelo. El puntaje suma ciencia × 10 y un bonus por presupuesto ahorrado cuando se cumple la meta en campaña.
+=======
+### Space center
+![Space center](docs/images/1_space_center.png)
 
-Después se tira el **dado de riesgo** (ver fórmulas). Si sale falla, se pierde el 50% de la ciencia.
+### Preflight equipment review
+![Equipment list and orbit review](docs/images/2_equipment_list.png)
+>>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a
 
----
+### Results
+![Results with explanatory feedback](docs/images/3_results.png)
 
-## 4. Modelo de datos y fórmulas
+### Flight history
+![Mission Archive](docs/images/4_flight_log.png)
 
-> Los valores son **inventados pero coherentes**, pensados para que haya trade-offs reales. Se cargan como **ScriptableObjects** y se pueden ajustar sin tocar código. Ya están probados en un prototipo web.
+## About the simulation
 
-### Base fija de la nave (estructura + computadora)
+Part masses, costs, power levels and data rates are simplified game values. Orbit lifetimes and real mission facts provide context; they do not form a continuous multiyear operations simulation. Launch follows an animated sequence with a stage-separation challenge. The player designs the mission rather than manually piloting the rocket.
 
-Masa 150 kg · consumo 40 W · costo $30M
+The current game is single-player. It does not include online multiplayer, a live orbital physics solver or cloud saves.
 
-### Instrumentos (máx. 3)
+## Run the Unity project
 
-| ID | Nombre | Masa (kg) | Consumo (W) | Costo ($M) | Datos (GB/día) | Descripción corta |
-|---|---|---|---|---|---|---|
-| `cam_b` | Cámara básica | 60 | 30 | 20 | 20 | Fotos simples. Barata y liviana. |
-| `cam_a` | Cámara avanzada | 120 | 80 | 50 | 60 | Mucho detalle, pesada y gastadora. |
-| `espec` | Espectrómetro | 90 | 60 | 40 | 40 | Analiza la luz para saber de qué están hechas las cosas. |
-| `radar` | Radar | 150 | 120 | 60 | 50 | Ve a través de nubes y de noche. Muy pesado. |
+1. Install **Unity 6.6, exactly 6000.6.9f1**, with **Web Build Support** for browser builds.
+2. Install Git LFS and clone:
 
-### Energía
+   ```sh
+   git lfs install
+   git clone https://github.com/eugenio-navarro/SpaceMissionGame.git
+   cd SpaceMissionGame
+   git lfs pull
+   ```
 
+3. Add the project to Unity Hub and open it with that editor version.
+4. Open `Assets/Scenes/MenuPrincipal.unity` and press Play.
+
+<<<<<<< HEAD
 | ID | Nombre | Masa (kg) | Genera (W) | Costo ($M) |
 |---|---|---|---|---|
 | `panel_s` | Panel solar chico | 20 | 120 | 10 |
@@ -180,27 +166,36 @@ Masa 150 kg · consumo 40 W · costo $30M
 | `panel_l` | Panel solar grande | 40 | 250 | 20 |
 | `bat` | Batería | 30 | — | 8 |
 | `bat_extended` | Batería extendida | 55 | — | 18 |
+=======
+The five build scenes, in order, are `MenuPrincipal`, `CentroEspacial`, `Hangar`, `Lanzamiento` and `Resultados`. The project uses **C#, URP, uGUI and the Input System**. The current part and contract catalog is `Assets/Scripts/Data/TestCatalog.cs`. Rules are in `MissionCalculator.cs` and `MissionOutcome.cs`.
+>>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a
 
-### Antenas
+### Browser build
 
+<<<<<<< HEAD
 | ID | Nombre | Masa (kg) | Consumo (W) | Costo ($M) | Bajada máx. (GB/día) |
 |---|---|---|---|---|---|
 | `ant_s` | Antena chica | 10 | 15 | 5 | 40 |
 | `ant_m` | Antena mediana | 18 | 25 | 10 | 70 |
 | `ant_l` | Antena grande | 25 | 40 | 15 | 100 |
+=======
+Select **Web** in **File > Build Profiles**, include all five scenes, and set **Compression Format: Disabled** for the current itch.io setup. Build to `Builds/WebGL`.
+>>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a
 
-Estaciones en Tierra: de 1 a 4, a **$10M cada una**. Factor de contacto por cantidad: `[0.5, 0.8, 1.0, 1.15]`.
+The publication wrapper in `docs/web-player/` preserves the responsive 16:9 layout. Copy its `index.html` and `TemplateData/style.css` over the generated files after building. Zip the **contents** of the build folder so `index.html` sits at the archive root. Upload as HTML and select **This file will be played in the browser**. The published embed is **960 x 540**, with fullscreen available.
 
-### Cohetes
+Generated Unity caches and builds are excluded from Git. The playable release is hosted on itch.io.
 
-| ID | Nombre | Capacidad a órbita baja (kg) | Costo ($M) |
-|---|---|---|---|
-| `chico` | Cohete chico | 500 | 60 |
-| `mediano` | Cohete mediano | 1200 | 110 |
-| `grande` | Cohete grande | 3000 | 180 |
+## Credits and AI use
 
-### Órbitas
+- **Team:** Hell0 World!, Buenos Aires.
+- **Models and particles:** Kenney, CC0.
+- **Planet and sky textures:** Solar System Scope, CC BY 4.0.
+- **Fonts:** Chakra Petch and Share Tech Mono, SIL Open Font License.
+- **Music and effects:** synthesized in the game by code.
+- **AI assistance:** Claude assisted with research, design, C# code, scene builders and English text, as recorded in the project references. ChatGPT assisted with publication, the responsive web player, documentation and submission materials. No AI-generated images or video were created for this delivery package. Screenshots show the game.
 
+<<<<<<< HEAD
 | ID | Nombre | Altura | Contacto | Vida útil | Multiplicador de capacidad del cohete | Sombra (necesita batería) |
 |---|---|---|---|---|---|---|
 | `leo` | Órbita baja | ~500 km | 0.5 | 3 años | ×1.0 | Sí |
@@ -490,3 +485,6 @@ Detalle completo en **`REFERENCES.md`**: hay que anotar cada asset al bajarlo.
 Eligible hazards roll independently. Storm and station interference each have 15% probability, Earth clouds 30%, lunar extended eclipse 25%. These are game-balance values. Multiple events can coincide. Clouds halve surviving camera production; eclipse retains 60% without battery, 85% basic battery, 100% extended battery. Storm shutdown precedes cloud/eclipse effects, then downlink and one hardware failure roll.
 
 New parts: medium panel (180W, 30kg, $15M), medium antenna (70GB/day, 25W, 18kg, $10M), extended battery (55kg, $18M). Success earns science x 10 plus savings; failed, partial and free-mode flights get zero savings bonus. Historical scores remain unchanged.
+=======
+See [REFERENCES.md](REFERENCES.md) for source URLs, licenses and the detailed AI disclosure, and [submission materials](docs/submission/SUBMISSION.md) for the prepared form text and delivery checklist.
+>>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a
