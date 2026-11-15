@@ -56,10 +56,20 @@ public class LaunchSequence : MonoBehaviour
 
     void Start()
     {
-        info = LaunchContext.GetOrCreateTestData();
+        // La misión llega desde el Hangar; si se abre la escena sola, se usan datos de prueba.
+        ResultsInfo run = ResultsContext.GetOrCreate();
+        if (ResultsContext.IsTestData && !string.IsNullOrEmpty(testRocketId))
+        {
+            run.rocketId = testRocketId;
+            run.rocketName = testRocketId == "chico" ? "Small rocket" : testRocketId == "grande" ? "Large rocket" : "Medium rocket";
+        }
+        // El evento y el dado de riesgo se sortean acá, una sola vez por lanzamiento.
+        if (!run.resolved)
+            MissionOutcome.Resolve(run, (LaunchEventKind)Random.Range(0, 3), Random.Range(0f, 100f));
+
+        info = LaunchInfo.FromRun(run);
         LaunchContext.LaunchFinished = false;
 
-        if (LaunchContext.IsTestData && !string.IsNullOrEmpty(testRocketId)) LaunchContext.UseTestRocket(testRocketId);
         PickRocket(info.rocketId);
         rocketStart = rocket.position;
         hud.Setup(info);
@@ -201,7 +211,7 @@ public class LaunchSequence : MonoBehaviour
         }
 
         // 4. Evento
-        hud.ShowEvent(info.eventTitle, info.eventText, info.eventKind == LaunchEventKind.Calm);
+        hud.ShowEvent(info.eventTitle, info.eventText, !ResultsContext.GetOrCreate().eventHurt);
         for (float t = 0f; t < eventSeconds; t += Time.deltaTime)
         {
             clock += Time.deltaTime;

@@ -13,16 +13,16 @@ public static class LaunchHudBuilder
     const string SpriteDir = "Assets/UI/Launch";
     const string FontDir = "Assets/UI/Fonts/";
 
-    static readonly Color Green = new Color(0.48f, 0.85f, 0.56f);
-    static readonly Color Orange = new Color(0.94f, 0.47f, 0.16f);
-    static readonly Color Blue = new Color(0.35f, 0.64f, 0.94f);
-    static readonly Color White = new Color(0.93f, 0.96f, 1f);
-    static readonly Color Muted = new Color(0.56f, 0.64f, 0.72f);
-    static readonly Color PanelFill = new Color(0.035f, 0.055f, 0.095f, 0.84f);
-    static readonly Color PanelLine = new Color(1f, 1f, 1f, 0.16f);
+    public static readonly Color Green = new Color(0.48f, 0.85f, 0.56f);
+    public static readonly Color Orange = new Color(0.94f, 0.47f, 0.16f);
+    public static readonly Color Blue = new Color(0.35f, 0.64f, 0.94f);
+    public static readonly Color White = new Color(0.93f, 0.96f, 1f);
+    public static readonly Color Muted = new Color(0.56f, 0.64f, 0.72f);
+    public static readonly Color PanelFill = new Color(0.035f, 0.055f, 0.095f, 0.84f);
+    public static readonly Color PanelLine = new Color(1f, 1f, 1f, 0.16f);
 
-    static Sprite rounded, outline, shadow, circle, ring, gradient;
-    static Font fontBold, fontSemi, fontMono;
+    public static Sprite rounded, outline, shadow, circle, ring, gradient;
+    public static Font fontBold, fontSemi, fontMono;
 
     public static LaunchHud Build()
     {
@@ -170,7 +170,7 @@ public static class LaunchHudBuilder
 
     // Tarjeta redondeada con sombra, relleno, borde fino y una barra de color a la izquierda.
     // anchor = pivot, así que position es la distancia a esa esquina o borde.
-    static RectTransform Card(string name, Transform parent, Vector2 anchor, Vector2 position, Vector2 size, Color accent)
+    public static RectTransform Card(string name, Transform parent, Vector2 anchor, Vector2 position, Vector2 size, Color accent)
     {
         GameObject go = new GameObject(name, typeof(RectTransform));
         go.transform.SetParent(parent, false);
@@ -194,7 +194,7 @@ public static class LaunchHudBuilder
         return rt;
     }
 
-    static Image Img(string name, Transform parent, Sprite sprite, Color color, bool sliced)
+    public static Image Img(string name, Transform parent, Sprite sprite, Color color, bool sliced)
     {
         GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image));
         go.transform.SetParent(parent, false);
@@ -211,7 +211,7 @@ public static class LaunchHudBuilder
     }
 
     // Texto que ocupa el padre, con márgenes (izquierda, abajo, derecha, arriba).
-    static Text Label(string name, Transform parent, Font font, int size, Color color, TextAnchor anchor, string text,
+    public static Text Label(string name, Transform parent, Font font, int size, Color color, TextAnchor anchor, string text,
         float left, float bottom, float right, float top)
     {
         GameObject go = new GameObject(name, typeof(RectTransform), typeof(Text));
@@ -230,7 +230,7 @@ public static class LaunchHudBuilder
         return t;
     }
 
-    static void Anchor(RectTransform rt, Vector2 min, Vector2 max, Vector2 pivot, Vector2 position, Vector2 size)
+    public static void Anchor(RectTransform rt, Vector2 min, Vector2 max, Vector2 pivot, Vector2 position, Vector2 size)
     {
         rt.anchorMin = min;
         rt.anchorMax = max;
@@ -239,7 +239,7 @@ public static class LaunchHudBuilder
         rt.sizeDelta = size;
     }
 
-    static void Stretch(RectTransform rt, float left, float bottom, float right, float top)
+    public static void Stretch(RectTransform rt, float left, float bottom, float right, float top)
     {
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
@@ -250,7 +250,7 @@ public static class LaunchHudBuilder
 
     // ================= Fuentes y sprites =================
 
-    static void LoadAssets()
+    public static void LoadAssets()
     {
         Font fallback = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         fontBold = AssetDatabase.LoadAssetAtPath<Font>(FontDir + "ChakraPetch-Bold.ttf") ?? fallback;
