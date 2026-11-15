@@ -19,12 +19,18 @@ public class MainMenu : MonoBehaviour
     {
         if (satelliteParts != null) satelliteParts.Show(ShowcaseDesign());
         if (cameraRig != null) cameraStart = cameraRig.position;
-        GameShell.SceneEscape = () => true; // en el menú, Esc no abre la pausa
+        GameShell.SceneEscape = BlockEscape; // en el menú, Esc no abre la pausa
         BuildUI();
         Refresh();
     }
 
-    void OnDestroy() => GameShell.SceneEscape = null;
+    static bool BlockEscape() => true;
+
+    // Solo lo limpia si sigue siendo el suyo (la escena siguiente puede haber puesto el propio).
+    void OnDestroy()
+    {
+        if (GameShell.SceneEscape == BlockEscape) GameShell.SceneEscape = null;
+    }
 
     void Update()
     {

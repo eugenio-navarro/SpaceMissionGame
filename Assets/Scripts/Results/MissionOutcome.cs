@@ -113,14 +113,17 @@ public static class MissionOutcome
 
     static string TryNext(ResultsInfo r, bool dataJam)
     {
-        if (r.riskFailure && r.riskPercent > 5)
+        // Una falla con márgenes holgados fue mala suerte: el consejo no debe culpar al diseño.
+        if (r.riskFailure && (r.EnergyMargin < 0.30f || r.MassMargin < 0.10f))
             return "Leave more spare power and mass. Thin margins are what push the risk up.";
+        if (r.riskFailure)
+            return "That was bad luck: every launch has some risk, even with good margins. Fly it again!";
         if (r.eventHurt && r.eventKind == LaunchEventKind.SolarStorm)
             return "Keep at least 20% power margin: a bigger solar panel or a lighter instrument.";
         if (r.eventHurt && r.eventKind == LaunchEventKind.StationInterference)
             return "Use 3 or more ground stations, so the others cover when one fails.";
         if (dataJam && r.design != null)
-            return MissionCalculator.DataFix(r.design) + " That way more data comes down.";
+            return MissionCalculator.DataFix(r.design);
         if (dataJam)
             return "Add a ground station or a bigger antenna so more data comes down.";
         if (r.result == ResultKind.Success)

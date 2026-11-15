@@ -106,10 +106,10 @@ public static class MissionCalculator
     {
         bool moreStations = d.stations < MaxStations;
         bool biggerAntenna = d.antenna != null && d.antenna.downlink < BiggestDownlink();
-        if (moreStations && biggerAntenna) return "Add ground stations or a bigger antenna.";
-        if (moreStations) return "Add ground stations.";
-        if (biggerAntenna) return "Use a bigger antenna.";
-        return "Use instruments that make less data.";
+        if (moreStations && biggerAntenna) return "Add ground stations or a bigger antenna so more data comes down.";
+        if (moreStations) return "Add ground stations so more data comes down.";
+        if (biggerAntenna) return "Use a bigger antenna so more data comes down.";
+        return "Your antenna and stations are maxed out: use instruments that make less data, or an orbit with more contact time.";
     }
 
     static float BiggestDownlink()

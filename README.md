@@ -265,22 +265,22 @@ El challenge pide explicar en simple, presentar los conceptos jugando y enseñar
 
 ### Imprescindible (MVP)
 
-- [ ] 4 escenas conectadas: CentroEspacial → Hangar → Lanzamiento → Resultados → CentroEspacial
-- [ ] Al menos 1 contrato completo (Observar la Tierra)
-- [ ] Hangar con las 4 pestañas y el HUD de recursos en vivo
-- [ ] Validaciones y botón Lanzar bloqueado con mensajes claros
-- [ ] Lanzamiento animado (Timeline + Cinemachine) y 1 evento
-- [ ] Resultados con puntaje y explicación del porqué
-- [ ] Textos CAPCOM y tooltips simples
+- [x] 4 escenas conectadas: CentroEspacial → Hangar → Lanzamiento → Resultados → CentroEspacial (más MenuPrincipal al inicio)
+- [x] Al menos 1 contrato completo (Observar la Tierra)
+- [x] Hangar con las 4 pestañas y el HUD de recursos en vivo
+- [x] Validaciones y botón Lanzar bloqueado con mensajes claros
+- [x] Lanzamiento animado y 1 evento (hecho con código propio en vez de Timeline + Cinemachine)
+- [x] Resultados con puntaje y explicación del porqué
+- [x] Textos CAPCOM y tooltips simples (descripción al pasar el mouse por cada pieza)
 - [ ] Build WebGL subida y funcionando
 
 ### Si llegamos
 
-- [ ] Los 3 contratos y el desbloqueo de piezas
-- [ ] Riesgo con dado y los 3 eventos
-- [ ] Vista de mapa con la órbita dibujada
-- [ ] Tabla de equipos (MEL) antes de lanzar
-- [ ] Trade study ("con otra elección habrías…")
+- [x] Los 3 contratos (se desbloquean en orden; las piezas no se bloquean, a propósito)
+- [x] Riesgo con dado y los 3 eventos
+- [x] Vista de mapa con la órbita dibujada (en la revisión previa al lanzamiento)
+- [x] Tabla de equipos (MEL) antes de lanzar
+- [x] Trade study ("con otra elección habrías…")
 - [ ] Vista previa del impacto al pasar el mouse
 
 ### Bonus
@@ -288,7 +288,7 @@ El challenge pide explicar en simple, presentar los conceptos jugando y enseñar
 - [ ] Modo equipo por turnos (de 2 a 4)
 - [x] Modo Libre
 - [x] Ranking local (PlayerPrefs)
-- [ ] Misión real parecida en los resultados
+- [x] Misión real parecida en los resultados (Landsat 9, SAOCOM, Hubble, LRO)
 - [x] Tutorial guiado
 - [x] Mini desafío de separación de etapas (apretar espacio en el momento justo)
 
@@ -334,7 +334,7 @@ Referencia: `Moodboard.pdf` (en la raíz del repo), basado en capturas de KSP. R
 
 ```
 Assets/
-  Scenes/        CentroEspacial, Hangar, Lanzamiento, Resultados
+  Scenes/        MenuPrincipal, CentroEspacial, Hangar, Lanzamiento, Resultados
   Scripts/
     Core/        MissionState, SceneLoader, MissionCalculator
     Data/        clases ScriptableObject (PartData, RocketData, OrbitData, ContractData)
@@ -470,9 +470,9 @@ Detalle completo en **`REFERENCES.md`**: hay que anotar cada asset al bajarlo.
 
 ## 13. Pendientes y decisiones abiertas
 
-- [ ] Nombre del equipo (opciones: *Binary Orbit*, *Austral Outpost*, *Space Compiler*…)
-- [ ] Nombre del juego
-- [ ] Modalidad: presencial el sábado en Palermo o 100% virtual
+- [x] Nombre del equipo: **Hell0 World!**
+- [x] Nombre del juego: **Space Mission Design**
+- [x] Modalidad: virtual (el domingo es todo por Discord; trabajo hasta las 15:00 y después presentaciones)
 - [ ] Confirmar con el organizador de BA el horario exacto de entrega y presentación
 - [ ] Diseño y nombre del personaje CAPCOM
 - [ ] Verificar el contenido real de los packs de Kenney al descargarlos
