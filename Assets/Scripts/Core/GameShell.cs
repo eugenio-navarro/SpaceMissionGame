@@ -211,6 +211,7 @@ public class GameShell : MonoBehaviour
         ShellScreens.BuildNotice(this, creditsLayer, caption, title, body);
     }
 
+    public void OpenGuide() { Clear(creditsLayer); ShellScreens.BuildGuide(this, creditsLayer); }
     public void OpenCredits() => ShellScreens.BuildCredits(this, creditsLayer);
     public void CloseCredits() => Clear(creditsLayer);
 

@@ -71,6 +71,7 @@ public static class MissionCalculator
         r.riskPercent = 5
             + (r.energyMargin < 0.10f ? 25 : r.energyMargin < 0.30f ? 10 : 0)
             + (r.massMargin < 0.10f ? 10 : 0);
+        r.riskPercent = Mathf.Max(1, Mathf.RoundToInt(r.riskPercent * Difficulty.RiskFactor));
 
         AddBlockers(d, contract, r, freeMode);
         AddWarnings(d, contract, r);

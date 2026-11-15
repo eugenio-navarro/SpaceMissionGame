@@ -46,9 +46,12 @@ public class HangarUI : MonoBehaviour
             clearButton.onClick.AddListener(Clear);
         }
 
-        infoText.text = "Pick parts in each tab. Watch the bars on the right: if something doesn't fit, LAUNCH stays locked. Numbers are simplified game values.";
+        infoText.text = "Hover a part to see what it does, click to add or remove it. Watch the bars on the right: if something doesn't fit, LAUNCH stays locked. Numbers are simplified game values.";
+        if (controller.StartedFromSeed)
+            infoText.text = "<b>Starter design loaded.</b> It can fly, but it won't reach the science goal yet. Change one part at a time and watch the bars. Hover a part to read what it does.";
         ShowTab(0);
         Refresh();
+        BuildGuideButton();
 
         GameShell.Tutorial("tut_hangar", new[]
         {
@@ -56,6 +59,16 @@ public class HangarUI : MonoBehaviour
             "The bars on the right compare what you use against what you have. <color=#7BD88F>Green</color> is fine, <color=#F0782A>orange</color> means trouble.",
             "Reach the science goal without going over budget. When there are no red X alerts, press <b>LAUNCH</b>!",
         }, UIFactory.Margin, 500f);
+    }
+
+    // Botón visible para abrir la guía de conceptos (también está en el menú de Esc).
+    void BuildGuideButton()
+    {
+        var root = launchButton.GetComponentInParent<Canvas>().rootCanvas.transform;
+        var guide = UIFactory.ButtonCard("GuideButton", root, "?  MISSION GUIDE", 20, null, null, false);
+        UIFactory.Pin((RectTransform)guide.transform, new Vector2(0.5f, 1f), new Vector2(0f, -72f), new Vector2(230f, 46f));
+        guide.transform.SetSiblingIndex(1);
+        guide.onClick.AddListener(() => { if (GameShell.Instance != null) GameShell.Instance.OpenGuide(); });
     }
 
     // Primer clic: pide confirmar. Segundo clic (dentro de 3 s): vacía el diseño.
@@ -217,6 +230,12 @@ public class HangarUI : MonoBehaviour
         FitOneLine(b, 15);
         var c = UIFactory.Label("Col3", row, col3, 24, numberColor, FontKind.Mono, TextAnchor.MiddleRight);
         UIFactory.Place(c.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-Col3Left, 0f), new Vector2(-14f, 0f));
+
+        // Pasar el mouse por una pieza muestra qué hace, sin elegirla.
+        var hover = button.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+        var entry = new UnityEngine.EventSystems.EventTrigger.Entry { eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter };
+        entry.callback.AddListener(_ => infoText.text = Describe(part));
+        hover.triggers.Add(entry);
 
         button.onClick.AddListener(() =>
         {

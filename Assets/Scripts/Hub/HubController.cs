@@ -170,6 +170,22 @@ public class HubController : MonoBehaviour
         if (archivePanel != null) archivePanel.gameObject.SetActive(false);
     }
 
+    Button difficultyButton;
+
+    // Botón de nivel de dificultad en Mission Control (se arma la primera vez que se abre el panel).
+    void BuildDifficultyButton()
+    {
+        if (difficultyButton != null) return;
+        difficultyButton = UIFactory.ButtonCard("Difficulty", freeModeButton.transform.parent, "", 22, null, null, false);
+        UIFactory.Pin((RectTransform)difficultyButton.transform, Vector2.one, new Vector2(-92f - 280f - 12f, -20f), new Vector2(340f, 56f));
+        difficultyButton.onClick.AddListener(() =>
+        {
+            Difficulty.Next();
+            RefreshContracts();
+            RefreshStatus();
+        });
+    }
+
     // En Modo Libre se puede aceptar cualquier contrato; en campaña, solo los desbloqueados.
     static bool CanAccept(ContractSpec c) => FreeMode.On || Campaign.IsUnlocked(c);
 
@@ -186,11 +202,13 @@ public class HubController : MonoBehaviour
     // Estado de cada tarjeta de contrato según la campaña: bloqueado, disponible, aceptado o completado.
     void RefreshContracts()
     {
+        BuildDifficultyButton();
+        difficultyButton.GetComponentInChildren<Text>().text = "LEVEL: " + Difficulty.Name;
         freeModeButton.GetComponentInChildren<Text>().text = FreeMode.On ? "FREE MODE: ON" : "FREE MODE: OFF";
         freeModeButton.GetComponent<CardButtonFx>().SetActive(FreeMode.On);
         freeModeHint.text = FreeMode.On
             ? "Experiment freely: no budget limit, all contracts open. Results don't count for the campaign."
-            : "";
+            : Difficulty.Summary;
         for (int i = 0; i < contractButtons.Length; i++)
         {
             var c = TestCatalog.Contracts[i];
@@ -202,6 +220,10 @@ public class HubController : MonoBehaviour
                 !open ? "LOCKED" : accepted ? "ACCEPTED" : rank > 0 ? "FLY AGAIN" : "ACCEPT";
             contractButtons[i].interactable = open && !accepted;
             contractAccents[i].color = open ? Palette.Orange : Palette.Dim;
+
+            // El presupuesto de la tarjeta depende del nivel de dificultad
+            var budgetText = contractButtons[i].transform.parent.Find("Line_Budget/Value");
+            if (budgetText != null) budgetText.GetComponent<Text>().text = $"${c.budget}M";
 
             var status = contractStatus[i];
             if (FreeMode.On) { status.text = accepted ? "FREE MODE · CURRENT CONTRACT" : "FREE MODE · NO BUDGET LIMIT"; status.color = Palette.Blue; }

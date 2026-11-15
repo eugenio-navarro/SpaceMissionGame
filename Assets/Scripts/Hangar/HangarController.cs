@@ -12,6 +12,7 @@ public class HangarController : MonoBehaviour
     public MissionReport Report { get; private set; }
 
     public event Action Changed;
+    public bool StartedFromSeed { get; private set; }
 
     void Awake()
     {
@@ -29,7 +30,11 @@ public class HangarController : MonoBehaviour
             Design.orbit = previous.orbit;
             Design.stations = previous.stations;
         }
-        else SaveData.LoadDesign(Contract.id, Design); // lo que quedó armado la última vez
+        else if (!SaveData.LoadDesign(Contract.id, Design) && Difficulty.StarterDesign) // lo que quedó armado la última vez
+        {
+            Difficulty.Seed(Contract, Design); // nivel Cadet: arranca con un diseño que vuela, para mejorarlo
+            StartedFromSeed = true;
+        }
         Recalculate();
     }
 

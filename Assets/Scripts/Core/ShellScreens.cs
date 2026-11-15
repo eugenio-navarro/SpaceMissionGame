@@ -37,6 +37,7 @@ public static class ShellScreens
             tutorial.GetComponentInChildren<Text>().text = "TUTORIAL WILL SHOW AGAIN";
         });
 
+        Button(window, "MISSION GUIDE", shell.OpenGuide);
         Button(window, "CREDITS", shell.OpenCredits);
         if (!fromTitle && !inHub) Button(window, "SPACE CENTER", shell.ToSpaceCenter);
 #if !UNITY_WEBGL
@@ -119,6 +120,37 @@ public static class ShellScreens
         return col;
     }
 
+    // ---------- Guía de conceptos (para quien nunca diseñó una misión) ----------
+
+    public static void BuildGuide(GameShell shell, RectTransform layer)
+    {
+        var dim = Dim(layer);
+        var window = Window(dim, "MISSION GUIDE", "How a space mission works", 1620f, Palette.Green);
+
+        var row = UIFactory.Rect("Columns", window);
+        var h = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+        h.spacing = 48f;
+        h.childControlWidth = h.childControlHeight = true;
+        h.childForceExpandWidth = true;
+        h.childForceExpandHeight = false;
+        var a = Column(row);
+        var b = Column(row);
+
+        Line(a, "YOUR JOB", "Pick a contract, build a satellite that can do it, launch it, and see how much science came back. Then improve it and fly again.");
+        Line(a, "SCIENCE (the score)", "Useful data that reaches Earth. Instruments make data, the antenna sends it down. Data that can't be sent is lost.");
+        Line(a, "MASS (kg)", "How heavy the satellite is. Every rocket can only lift so much. Higher orbits are harder, so the same rocket lifts less.");
+        Line(a, "POWER (W)", "Instruments and the antenna use electricity. Solar panels make it. If you use more than you make, you can't launch.");
+        Line(a, "BATTERY AND ECLIPSE", "When the satellite passes through shadow, panels make nothing. A battery keeps everything on.");
+
+        Line(b, "DATA AND COMMS (GB/day)", "A satellite can only talk to Earth while it flies over a ground station. More stations or a bigger antenna = more data comes home.");
+        Line(b, "ORBIT", "The path around Earth or the Moon. Low orbit: sharp detail, short contact. Geostationary: always in contact, far away. Lunar: around the Moon.");
+        Line(b, "MARGIN", "What you have left over. If panels make 250 W and you use 160 W, your margin is 36%. Spare margin protects you from surprises.");
+        Line(b, "FAILURE RISK", "The chance that something breaks. Thin power or mass margins push it up. If it happens, half the science is lost.");
+        Line(b, "BUDGET ($M)", "Every part, rocket and ground station costs money. Going over budget blocks the launch. Cheaper designs score higher.");
+
+        Button(window, "GOT IT", shell.CloseCredits);
+    }
+
     // ---------- Aviso ----------
 
     public static void BuildNotice(GameShell shell, RectTransform layer, string caption, string title, string body)
@@ -176,6 +208,7 @@ public static class ShellScreens
                 onPlay();
             });
         }
+        Button(buttons, "HOW TO PLAY", shell.OpenGuide);
         Button(buttons, "OPTIONS", onOptions);
         Button(buttons, "CREDITS", shell.OpenCredits);
 #if !UNITY_WEBGL
