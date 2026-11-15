@@ -15,6 +15,7 @@ public static class HubModal
         dim.color = new Color(0f, 0f, 0f, 0.5f);
 
         window = UIFactory.Card("Window", modal, accent);
+        window.Find("Fill").GetComponent<Image>().color = new Color(0.035f, 0.045f, 0.065f, 0.99f);
         UIFactory.Pin(window, new Vector2(0.5f, 0.5f), Vector2.zero, size);
         UIFactory.Appear(window.gameObject);
 

@@ -22,6 +22,7 @@ public class HangarUI : MonoBehaviour
     int currentTab;
     float clearArmedUntil;
     MissionReview review;
+    MissionTablet tablet;
     Text clearLabel;
     static string Orange => Palette.Tag(Palette.Orange);
     static string Green => Palette.Tag(Palette.Green);
@@ -52,12 +53,14 @@ public class HangarUI : MonoBehaviour
         ShowTab(0);
         Refresh();
         BuildGuideButton();
+        tablet = MissionTablet.Create(transform, controller);
+        var forecast = UIFactory.ButtonCard("ForecastButton", transform, "MISSION FORECAST", 23, null, null, false);
+        UIFactory.Pin((RectTransform)forecast.transform, new Vector2(0.5f, 1f), new Vector2(0f, -132f), new Vector2(320f, 58f));
+        forecast.onClick.AddListener(() => { if (tablet.IsOpen) tablet.Close(); else tablet.Open(); });
+        UILayout.ApplyHangar(this);
 
         StartTutorial();
-        infoText.verticalOverflow = VerticalWrapMode.Truncate;
-        infoText.resizeTextForBestFit = true;
-        infoText.resizeTextMinSize = 14;
-        infoText.resizeTextMaxSize = infoText.fontSize;
+
     }
 
     // Tutorial guiado: abre cada pestaña y espera a que el jugador elija la pieza que se pide.
@@ -117,6 +120,7 @@ public class HangarUI : MonoBehaviour
 
     bool CloseReview()
     {
+        if (tablet != null && tablet.IsOpen) { tablet.Close(); return true; }
         if (review == null || !review.IsOpen) return false;
         review.Close();
         return true;
@@ -134,6 +138,8 @@ public class HangarUI : MonoBehaviour
         for (int i = 0; i < tabButtons.Length; i++)
             tabButtons[i].GetComponent<CardButtonFx>().SetActive(i == tab);
         BuildRows();
+        var scroll = listContent.GetComponentInParent<ScrollRect>();
+        if (scroll != null) scroll.verticalNormalizedPosition = 1f;
     }
 
     void Refresh()

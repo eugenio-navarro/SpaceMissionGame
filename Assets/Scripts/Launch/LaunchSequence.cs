@@ -67,7 +67,7 @@ public class LaunchSequence : MonoBehaviour
         }
         // El evento y el dado de riesgo se sortean acá, una sola vez por lanzamiento.
         if (!run.resolved)
-            MissionOutcome.Resolve(run, (LaunchEventKind)Random.Range(0, 3), Random.Range(0f, 100f));
+            MissionOutcome.Resolve(run, MissionForecast.RollEvents(run, () => Random.Range(0f, 100f)), Random.Range(0f, 100f));
 
         info = LaunchInfo.FromRun(run);
         LaunchContext.LaunchFinished = false;

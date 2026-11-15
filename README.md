@@ -1,4 +1,4 @@
-# Space Mission Design Game
+# Mission Control: Build to Launch
 
 Juego 3D en Unity para el **NASA Space Apps Challenge 2026**, challenge **"Space Mission Design Game"**.
 
@@ -140,11 +140,15 @@ CENTRO ESPACIAL (menú principal, vista aérea 3D)
 
 ### Eventos de la simulación
 
-Se sortea uno por lanzamiento:
+Cada evento elegible se sortea de forma independiente y pueden coincidir varios. Las probabilidades son valores de balance de la simulación.
 
 - **Tormenta solar:** si el margen de energía es menor al 20%, se apaga el instrumento que más consume. Si no, el margen lo protege.
 - **Interferencia en estación:** si hay menos de 3 estaciones, se baja un 20% menos de datos. Si hay 3 o más, las otras cubren.
-- **Calma:** sin imprevistos.
+- **Nubosidad (30%, contrato Tierra):** reduce a la mitad los datos de las cámaras que siguen activas. El radar conserva su producción.
+- **Eclipse lunar prolongado (25%, contrato Luna en órbita lunar):** conserva 60% de producción sin batería, 85% con batería básica y 100% con batería extendida.
+- **Calma:** ningún evento ocurrió. Tormenta e interferencia tienen 15% de probabilidad cada una.
+
+La tablet **Mission Forecast** del hangar muestra probabilidades, coincidencias y ciencia estimada usando las mismas reglas del vuelo. El puntaje suma ciencia × 10 y un bonus por presupuesto ahorrado cuando se cumple la meta en campaña.
 
 Después se tira el **dado de riesgo** (ver fórmulas). Si sale falla, se pierde el 50% de la ciencia.
 
@@ -172,14 +176,17 @@ Masa 150 kg · consumo 40 W · costo $30M
 | ID | Nombre | Masa (kg) | Genera (W) | Costo ($M) |
 |---|---|---|---|---|
 | `panel_s` | Panel solar chico | 20 | 120 | 10 |
+| `panel_m` | Panel solar mediano | 30 | 180 | 15 |
 | `panel_l` | Panel solar grande | 40 | 250 | 20 |
 | `bat` | Batería | 30 | — | 8 |
+| `bat_extended` | Batería extendida | 55 | — | 18 |
 
 ### Antenas
 
 | ID | Nombre | Masa (kg) | Consumo (W) | Costo ($M) | Bajada máx. (GB/día) |
 |---|---|---|---|---|---|
 | `ant_s` | Antena chica | 10 | 15 | 5 | 40 |
+| `ant_m` | Antena mediana | 18 | 25 | 10 | 70 |
 | `ant_l` | Antena grande | 25 | 40 | 15 | 100 |
 
 Estaciones en Tierra: de 1 a 4, a **$10M cada una**. Factor de contacto por cantidad: `[0.5, 0.8, 1.0, 1.15]`.
@@ -471,9 +478,15 @@ Detalle completo en **`REFERENCES.md`**: hay que anotar cada asset al bajarlo.
 ## 13. Pendientes y decisiones abiertas
 
 - [x] Nombre del equipo: **Hell0 World!**
-- [x] Nombre del juego: **Space Mission Design**
+- [x] Nombre del juego: **Mission Control: Build to Launch**
 - [x] Modalidad: virtual (el domingo es todo por Discord; trabajo hasta las 15:00 y después presentaciones)
 - [ ] Confirmar con el organizador de BA el horario exacto de entrega y presentación
 - [ ] Diseño y nombre del personaje CAPCOM
 - [ ] Verificar el contenido real de los packs de Kenney al descargarlos
 - [ ] Subir la primera build WebGL a itch.io
+
+## Local gameplay increment
+
+Eligible hazards roll independently. Storm and station interference each have 15% probability, Earth clouds 30%, lunar extended eclipse 25%. These are game-balance values. Multiple events can coincide. Clouds halve surviving camera production; eclipse retains 60% without battery, 85% basic battery, 100% extended battery. Storm shutdown precedes cloud/eclipse effects, then downlink and one hardware failure roll.
+
+New parts: medium panel (180W, 30kg, $15M), medium antenna (70GB/day, 25W, 18kg, $10M), extended battery (55kg, $18M). Success earns science x 10 plus savings; failed, partial and free-mode flights get zero savings bonus. Historical scores remain unchanged.

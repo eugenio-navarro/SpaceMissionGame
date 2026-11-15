@@ -9,25 +9,31 @@ public static class TestCatalog
     {
         // Instrumentos
         new PartSpec { id = "cam_b", displayName = "Basic camera", category = PartCategory.Instrument, mass = 60, power = 30, cost = 20, dataRate = 20,
-            description = "Simple photos. Cheap and light. Real example: the small cameras on CubeSats, satellites built from 10 cm cubes." },
+            description = "Low-cost survey camera. Lower mass and power leave room for a second instrument or battery. Optical surface observations lose useful data under clouds." },
         new PartSpec { id = "cam_a", displayName = "Advanced camera", category = PartCategory.Instrument, mass = 120, power = 80, cost = 50, dataRate = 60,
-            description = "Lots of detail, but heavy and power-hungry. Real example: Landsat 9's OLI camera sees Earth in 9 bands of light." },
+            description = "Collects more observations for demanding science goals, with higher mass, power and cost. Needs enough downlink to benefit. Clouds affect both cameras." },
         new PartSpec { id = "espec", displayName = "Spectrometer", category = PartCategory.Instrument, mass = 90, power = 60, cost = 40, dataRate = 40,
             description = "Splits light to find out what things are made of. Real example: LRO's LAMP hunts for ice in the Moon's dark craters." },
         new PartSpec { id = "radar", displayName = "Radar", category = PartCategory.Instrument, mass = 150, power = 120, cost = 60, dataRate = 50,
-            description = "Sees through clouds and at night. Very heavy. Real example: the L-band radar on Argentina's SAOCOM satellites (CONAE)." },
+            description = "Sees through clouds and at night. Very heavy. Real example: NASA-ISRO NISAR mapping floods through clouds." },
 
         // Energía
         new PartSpec { id = "panel_s", displayName = "Small solar panel", category = PartCategory.SolarPanel, mass = 20, generation = 120, cost = 10,
             description = "Makes 120 W in sunlight." },
+        new PartSpec { id = "panel_m", displayName = "Medium solar panel", category = PartCategory.SolarPanel, mass = 30, generation = 180, cost = 15,
+            description = "Makes 180 W in sunlight. A middle option when the small panel falls short and the large panel adds unnecessary mass." },
         new PartSpec { id = "panel_l", displayName = "Large solar panel", category = PartCategory.SolarPanel, mass = 40, generation = 250, cost = 20,
             description = "Makes 250 W in sunlight. Real example: Hubble's panels make up to 5,500 W." },
         new PartSpec { id = "bat", displayName = "Battery", category = PartCategory.Battery, mass = 30, cost = 8,
-            description = "Keeps everything running during eclipses, when the satellite is in shadow and the panels get no sunlight. Real example: Hubble carries six batteries." },
+            description = "Keeps everything running during eclipses, when the satellite is in shadow and the panels get no sunlight. Retains 85% of science production during the simulated extended lunar eclipse." },
+        new PartSpec { id = "bat_extended", displayName = "Extended battery", category = PartCategory.Battery, mass = 55, cost = 18, extendedEclipseRetention = 1f,
+            description = "Extra endurance retains all science production during the simulated extended lunar eclipse. Costs more and adds mass. Values are simplified for gameplay." },
 
         // Antenas
         new PartSpec { id = "ant_s", displayName = "Small antenna", category = PartCategory.Antenna, mass = 10, power = 15, cost = 5, downlink = 40,
             description = "Sends up to 40 GB/day to Earth." },
+        new PartSpec { id = "ant_m", displayName = "Medium antenna", category = PartCategory.Antenna, mass = 18, power = 25, cost = 10, downlink = 70,
+            description = "Sends up to 70 GB/day before contact limits. Lower power and mass than the large antenna, with more capacity than the small antenna." },
         new PartSpec { id = "ant_l", displayName = "Large antenna", category = PartCategory.Antenna, mass = 25, power = 40, cost = 15, downlink = 100,
             description = "Sends up to 100 GB/day to Earth. Real example: LRO sends home about 900 gigabits (~112 GB) a day." },
 

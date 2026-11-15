@@ -94,6 +94,12 @@ public static class SaveData
 
     public static int Score(int science, int budget, int cost) => science * 10 + Mathf.Max(0, budget - cost);
 
+    public static int EfficiencyBonus(int budget, int cost, bool goalReached, bool freeMode) =>
+        goalReached && !freeMode ? Mathf.Max(0, budget - Mathf.Max(0, cost)) : 0;
+
+    public static int Score(ResultsInfo run, bool freeMode) =>
+        run.science * 10 + EfficiencyBonus(run.budget, run.cost, run.science >= run.scienceGoal, freeMode);
+
     // Guarda el puntaje en el top 5 del contrato. Devuelve el puesto (1 a 5) o 0 si no entró.
     public static int AddScore(string contractTitle, int score)
     {

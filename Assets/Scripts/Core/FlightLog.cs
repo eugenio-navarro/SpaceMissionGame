@@ -80,7 +80,7 @@ public static class FlightLog
         if (f.science >= f.goal) list.Add($"Science goal reached: {f.science} of {f.goal}.");
         if (f.dataMade > 0f && f.dataReceived >= f.dataMade - 0.01f) list.Add("All the data your instruments made reached Earth.");
         if (f.massMargin >= 0.10f) list.Add($"Mass margin of {Pct(f.massMargin)}: the rocket had room to spare.");
-        if (f.powerMargin >= MissionOutcome.StormSafeMargin) list.Add($"Power margin of {Pct(f.powerMargin)}: enough to ride out a solar storm.");
+        if (f.powerMargin >= MissionOutcome.StormSafeMargin) list.Add($"Power margin of {Pct(f.powerMargin)}: covers the simplified storm interruption in this game.");
         if (!f.eventHurt && f.eventTitle != null && f.eventTitle != "ALL CALM") list.Add($"Your design survived the {f.eventTitle.ToLower()}.");
         if (f.mode != "Free mode" && f.cost <= f.budget) list.Add($"Stayed within budget: ${f.cost}M of ${f.budget}M.");
         if (!f.riskFailure && f.risk > 10) list.Add($"No part failed, even with {f.risk}% risk (lucky!).");

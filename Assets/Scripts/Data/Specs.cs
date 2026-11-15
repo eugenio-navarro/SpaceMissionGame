@@ -24,6 +24,7 @@ public class PartSpec
     public bool hasShadow;                 // la órbita pasa por la sombra de la Tierra
     public int lifeYears;                  // vida útil (órbitas)
     public string altitude;                // texto de altura (órbitas)
+    public float extendedEclipseRetention = 0.85f;
     public string description;
 }
 

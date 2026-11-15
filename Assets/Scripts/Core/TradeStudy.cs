@@ -46,10 +46,18 @@ public static class TradeStudy
         foreach (var p in TestCatalog.ByCategory(PartCategory.Orbit).Where(p => p != d.orbit && c.AllowsOrbit(p.id)))
         { var a = Clone(d); a.orbit = p; yield return ($"{p.displayName} instead", a); }
 
-        var battery = TestCatalog.ByCategory(PartCategory.Battery).First();
-        var b = Clone(d);
-        b.battery = d.battery == null ? battery : null;
-        yield return (d.battery == null ? "Adding a battery" : "Without the battery", b);
+        foreach (var battery in TestCatalog.ByCategory(PartCategory.Battery).Where(p => p != d.battery))
+        {
+            var alternative = Clone(d);
+            alternative.battery = battery;
+            yield return ($"Using the {battery.displayName.ToLower()}", alternative);
+        }
+        if (d.battery != null)
+        {
+            var alternative = Clone(d);
+            alternative.battery = null;
+            yield return ("Without the battery", alternative);
+        }
 
         foreach (var p in TestCatalog.ByCategory(PartCategory.Instrument).Where(p => !c.IsLocked(p.id)))
         {

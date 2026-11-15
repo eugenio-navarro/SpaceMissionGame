@@ -20,6 +20,7 @@ public class MissionReview : MonoBehaviour
         dim.color = new Color(0f, 0f, 0f, 0.6f);
 
         var window = UIFactory.Card("Window", modal, Palette.Orange);
+        window.Find("Fill").GetComponent<Image>().color = new Color(0.035f, 0.045f, 0.065f, 0.99f);
         UIFactory.Pin(window, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1540f, 860f));
         UIFactory.Appear(window.gameObject);
 
@@ -114,7 +115,7 @@ public class MissionReview : MonoBehaviour
             if (cells[i].StartsWith("+")) t.color = Palette.Green;
             if (bold && !header && i >= 2) t.color = Palette.TextMain;
             if (bold && !header && i == 3) t.color = cells[i].StartsWith("-") ? Palette.Orange : Palette.Green; // energía que sobra o falta
-            t.horizontalOverflow = HorizontalWrapMode.Overflow;
+            UILayout.Fit(t, 16);
             UIFactory.Place(t.rectTransform, Vector2.zero, new Vector2(0f, 1f), new Vector2(x, 0f), new Vector2(x + Widths[i] - 10f, 0f));
             x += Widths[i];
         }

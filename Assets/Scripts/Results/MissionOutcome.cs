@@ -10,73 +10,71 @@ public static class MissionOutcome
     public const float RiskFailureLoss = 0.50f;
     public const float PartialThreshold = 0.60f;
 
-    // riskRoll: número entre 0 y 100. Si es menor que el riesgo del diseño, algo falla.
-    public static void Resolve(ResultsInfo r, LaunchEventKind eventKind, float riskRoll)
+    public static bool IsEligible(ResultsInfo r, LaunchEventKind kind)
     {
+        switch (kind)
+        {
+            case LaunchEventKind.Calm:
+            case LaunchEventKind.SolarStorm:
+            case LaunchEventKind.StationInterference: return true;
+            case LaunchEventKind.CloudCover: return r.design != null && r.destination == "EARTH";
+            case LaunchEventKind.ExtendedEclipse: return r.design != null && r.destination == "MOON" && r.orbitId == "lunar";
+            default: return false;
+        }
+    }
+
+    public static void Resolve(ResultsInfo r, LaunchEventKind kind, float riskRoll) =>
+        Resolve(r, new[] { kind }, riskRoll);
+
+    public static void Resolve(ResultsInfo r, System.Collections.Generic.IReadOnlyList<LaunchEventKind> events, float riskRoll)
+    {
+        var selected = new System.Collections.Generic.List<LaunchEventKind>();
+        foreach (var kind in MissionForecast.Hazards)
+            if (IsEligible(r, kind) && events != null)
+                for (int i = 0; i < events.Count; i++)
+                    if (events[i] == kind) { selected.Add(kind); break; }
+        r.occurredEvents = selected.ToArray();
+        r.eventKind = selected.Count > 0 ? selected[0] : LaunchEventKind.Calm;
+        bool storm = selected.Contains(LaunchEventKind.SolarStorm) && r.EnergyMargin < StormSafeMargin;
+        bool clouds = selected.Contains(LaunchEventKind.CloudCover);
         float generated = r.dataGenerated;
+        if (r.design != null)
+        {
+            PartSpec disabled = null;
+            if (storm)
+                foreach (var part in r.design.instruments)
+                    if (disabled == null || part.power > disabled.power) disabled = part;
+            generated = 0f;
+            foreach (var part in r.design.instruments)
+                if (part != disabled)
+                    generated += part.dataRate * (clouds && (part.id == "cam_b" || part.id == "cam_a") ? 0.5f : 1f);
+        }
+        else if (storm) generated = Mathf.Max(0f, generated - r.hungriestInstrumentData);
+        if (selected.Contains(LaunchEventKind.ExtendedEclipse)) generated *= EclipseRetention(r);
         float downlink = r.downlink;
-        int marginPercent = Mathf.RoundToInt(r.EnergyMargin * 100f);
-
-        r.eventKind = eventKind;
-        r.eventHurt = false;
-
-        if (eventKind == LaunchEventKind.SolarStorm)
-        {
-            r.eventTitle = "SOLAR STORM";
-            if (r.EnergyMargin < StormSafeMargin)
-            {
-                r.eventHurt = true;
-                generated = Mathf.Max(0f, generated - r.hungriestInstrumentData);
-                r.eventText = "A burst of particles from the Sun hit the spacecraft. With only " + marginPercent +
-                              "% power margin, the " + r.hungriestInstrument.ToLower() + " had to shut down." + StormCase;
-            }
-            else
-            {
-                r.eventText = "A burst of particles from the Sun hit the spacecraft. Your " + marginPercent +
-                              "% power margin kept every instrument on." + StormCase;
-            }
-        }
-        else if (eventKind == LaunchEventKind.StationInterference)
-        {
-            r.eventTitle = "GROUND STATION INTERFERENCE";
-            if (r.stations < InterferenceSafeStations)
-            {
-                r.eventHurt = true;
-                downlink *= 1f - InterferenceLoss;
-                r.eventText = "One antenna on Earth lost the signal. With only " + r.stations +
-                              (r.stations == 1 ? " station" : " stations") + ", 20% less data came down.";
-            }
-            else
-            {
-                r.eventText = "One antenna on Earth lost the signal, but your other " + (r.stations - 1) +
-                              " stations covered for it.";
-            }
-        }
-        else
-        {
-            r.eventTitle = "ALL CALM";
-            r.eventText = "No surprises this time. Space was quiet during the launch.";
-        }
-
+        if (selected.Contains(LaunchEventKind.StationInterference) && r.stations < InterferenceSafeStations)
+            downlink *= 1f - InterferenceLoss;
         r.received = Mathf.Min(generated, downlink);
-        int science = Mathf.FloorToInt(r.received * r.detail + 0.5f);
-
+        r.eventHurt = r.received < Mathf.Min(r.dataGenerated, r.downlink) - 0.001f;
         r.riskFailure = riskRoll < r.riskPercent;
-        if (r.riskFailure) science = Mathf.FloorToInt(science * (1f - RiskFailureLoss) + 0.5f);
-        r.science = science;
-
-        if (science >= r.scienceGoal) r.result = ResultKind.Success;
-        else if (science >= r.scienceGoal * PartialThreshold) r.result = ResultKind.Partial;
-        else r.result = ResultKind.Failed;
-
-        bool dataJam = r.dataGenerated > r.downlink + 0.01f;
+        r.science = Mathf.FloorToInt(r.received * r.detail + 0.5f);
+        if (r.riskFailure) r.science = Mathf.FloorToInt(r.science * (1f - RiskFailureLoss) + 0.5f);
+        r.result = r.science >= r.scienceGoal ? ResultKind.Success : r.science >= r.scienceGoal * PartialThreshold ? ResultKind.Partial : ResultKind.Failed;
+        var notes = new System.Collections.Generic.List<string>();
+        foreach (var kind in selected) notes.Add(MissionForecast.Name(kind) + ": " + MissionForecast.Mitigation(r, kind));
+        r.eventTitle = selected.Count == 0 ? "ALL CALM" : selected.Count == 1 ? MissionForecast.Name(selected[0]).ToUpperInvariant() : selected.Count + " MISSION EVENTS";
+        r.eventText = selected.Count == 0 ? "No environmental events occurred this flight." : string.Join("\n", notes);
         r.headline = Headline(r);
-        r.why = Why(r, r.dataGenerated, r.downlink, dataJam);
-        r.tryNext = TryNext(r, dataJam);
+        r.why = $"After events, instruments produced {generated:0.#} GB/day; available downlink was {downlink:0.#}. Earth received {r.received:0.#} GB/day.";
+        if (r.riskFailure) r.why += " A hardware failure then halved the science return.";
+        r.tryNext = selected.Count > 0 ? "Check the forecast tablet: compare radar, battery endurance, spare power and ground stations before flying again." : TryNext(r, generated > downlink);
         r.capcomLine = Capcom(r);
         r.similarMissionNote = SimilarNote(r.similarMission);
         r.resolved = true;
     }
+
+    public static float EclipseRetention(ResultsInfo r) => r.design?.battery == null ? 0.6f :
+        r.design.battery.extendedEclipseRetention > 0f ? Mathf.Clamp01(r.design.battery.extendedEclipseRetention) : 0.85f;
 
     static string Headline(ResultsInfo r)
     {
@@ -84,31 +82,6 @@ public static class MissionOutcome
         if (r.result == ResultKind.Partial) return "Some science came back, but not enough.";
         if (r.riskFailure) return "A part failed on the way up, and too little science reached Earth.";
         return "The spacecraft works, but too little science reached Earth.";
-    }
-
-    static string Why(ResultsInfo r, float generated, float downlink, bool dataJam)
-    {
-        string text;
-        if (dataJam)
-        {
-            int lost = Mathf.RoundToInt((1f - downlink / generated) * 100f);
-            text = "Your instruments made " + generated.ToString("0") + " GB/day, but the antenna could only bring down " +
-                   downlink.ToString("0") + ". " + lost + "% of the data never reached Earth.";
-        }
-        else
-        {
-            text = "Your instruments made " + generated.ToString("0") + " GB/day and all of it reached Earth.";
-        }
-
-        if (r.eventHurt && r.eventKind == LaunchEventKind.SolarStorm)
-            text += " Then a solar storm switched off the " + r.hungriestInstrument.ToLower() + " because the power margin was too thin, so its data was lost.";
-        else if (r.eventHurt && r.eventKind == LaunchEventKind.StationInterference)
-            text += " Then a ground station lost the signal and there were too few stations to cover for it, so even less came down.";
-
-        if (r.riskFailure)
-            text += " A part also failed on the way up (the risk was " + r.riskPercent + "%), and half of the science was lost.";
-
-        return text;
     }
 
     static string TryNext(ResultsInfo r, bool dataJam)
@@ -130,10 +103,6 @@ public static class MissionOutcome
             return "Try to reach the same goal with a cheaper or lighter design.";
         return "Add an instrument that makes more data, or pick an orbit with more detail.";
     }
-
-    // Caso real (CIRES/NOAA): en febrero de 2022 una tormenta calentó la atmósfera alta y 38 de 49
-    // satélites Starlink recién lanzados cayeron por el roce. El mecanismo del juego es otro (energía).
-    const string StormCase = " Real case: in February 2022 a solar storm made 38 new Starlink satellites fall back to Earth.";
 
     static string Capcom(ResultsInfo r)
     {

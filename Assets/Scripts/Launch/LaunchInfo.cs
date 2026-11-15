@@ -7,7 +7,9 @@ public enum LaunchEventKind
 {
     Calm,
     SolarStorm,
-    StationInterference
+    StationInterference,
+    CloudCover,
+    ExtendedEclipse
 }
 
 [Serializable]

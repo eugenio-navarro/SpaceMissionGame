@@ -74,22 +74,22 @@ public class MainMenu : MonoBehaviour
 
     void BuildUI()
     {
-        const float left = 120f, width = 470f;
+        const float left = 100f, width = 620f;
 
         var column = UIFactory.Rect("Column", canvasRoot);
         UIFactory.Place(column, Vector2.zero, new Vector2(0f, 1f), new Vector2(left, 36f), new Vector2(left + width, -36f));
-        var v = UIFactory.Vertical(column.gameObject, 0, 0, 0, 0, 10f);
+        var v = UIFactory.Vertical(column.gameObject, 0, 0, 0, 0, 8f);
         v.childAlignment = TextAnchor.MiddleLeft;
         UIFactory.Appear(column.gameObject);
 
         var caption = UIFactory.Label("Event", column, "NASA SPACE APPS CHALLENGE 2026", 19, Palette.Blue, FontKind.Body);
         UIFactory.Layout(caption.gameObject, 28f);
-        var t1 = UIFactory.Label("Title1", column, "SPACE MISSION", 62, Palette.TextMain, FontKind.Title);
+        var t1 = UIFactory.Label("Title1", column, "MISSION CONTROL:", 54, Palette.TextMain, FontKind.Title);
         t1.horizontalOverflow = HorizontalWrapMode.Overflow;
-        UIFactory.Layout(t1.gameObject, 66f);
-        var t2 = UIFactory.Label("Title2", column, "DESIGN", 104, Palette.Orange, FontKind.Title);
+        UIFactory.Layout(t1.gameObject, 64f);
+        var t2 = UIFactory.Label("Title2", column, "BUILD TO LAUNCH", 56, Palette.Orange, FontKind.Title);
         t2.horizontalOverflow = HorizontalWrapMode.Overflow;
-        UIFactory.Layout(t2.gameObject, 104f);
+        UIFactory.Layout(t2.gameObject, 66f);
         var tag = UIFactory.Label("Tagline", column, "Plan a satellite. Build it. Launch it.\nFind out why it worked.", 22, Palette.TextSecondary, FontKind.Body);
         UIFactory.Layout(tag.gameObject, 64f);
         UIFactory.Layout(UIFactory.Rect("Gap", column).gameObject, 6f);
@@ -120,7 +120,7 @@ public class MainMenu : MonoBehaviour
 
         // Explicación de la última opción tocada
         hint = UIFactory.Label("Hint", column, "Hover LEVEL, FREE MODE or TUTORIAL to see what each option does.", 17, Palette.TextSecondary, FontKind.Body, TextAnchor.UpperLeft);
-        UIFactory.Layout(hint.gameObject, 150f);
+        UIFactory.Layout(hint.gameObject, 110f);
         hint.verticalOverflow = VerticalWrapMode.Truncate;
         hint.resizeTextForBestFit = true;
         hint.resizeTextMinSize = 13;

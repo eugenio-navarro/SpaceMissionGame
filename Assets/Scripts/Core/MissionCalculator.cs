@@ -121,6 +121,8 @@ public static class MissionCalculator
 
     static void AddWarnings(MissionDesign d, ContractSpec c, MissionReport r)
     {
+        if (c.id == "earth") r.warnings.Add("Forecast: clouds reduce camera observations; radar keeps observing through clouds.");
+        if (c.id == "moon") r.warnings.Add("Forecast: an extended lunar eclipse rewards extra battery endurance.");
         if (d.orbit != null && d.orbit.hasShadow && d.panel != null && d.battery == null)
             r.warnings.Add("No battery: in shadow (eclipse) the panels make no power, so on average you only get 65%.");
 

@@ -42,6 +42,7 @@ public class GameShell : MonoBehaviour
         Instance = this;
         BuildCanvas();
         BuildAudio();
+        StartCoroutine(ApplyLayout());
         SceneManager.sceneLoaded += OnSceneLoaded;
         StartCoroutine(FadeTo(0f, 0.5f, 1f));
     }
@@ -60,6 +61,13 @@ public class GameShell : MonoBehaviour
         loading = false;
         StopAllCoroutines();
         StartCoroutine(FadeTo(0f, 0.45f, 1f));
+        StartCoroutine(ApplyLayout());
+    }
+
+    IEnumerator ApplyLayout()
+    {
+        yield return null;
+        UILayout.ApplyScene();
     }
 
     // ---------- Cambio de escena con fundido ----------
@@ -271,7 +279,7 @@ public class GameShell : MonoBehaviour
         var scaler = gameObject.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        UILayout.Configure(scaler);
         gameObject.AddComponent<GraphicRaycaster>();
 
         var root = (RectTransform)transform;

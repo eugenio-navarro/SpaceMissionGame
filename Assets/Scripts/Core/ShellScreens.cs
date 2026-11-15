@@ -7,7 +7,7 @@ using UnityEngine.UI;
 // menú de pausa y opciones, créditos y pantalla de título.
 public static class ShellScreens
 {
-    const string GameTitle = "SPACE MISSION DESIGN";
+    const string GameTitle = UILayout.GameTitle;
 
     // ---------- Menú de pausa / opciones ----------
 
@@ -110,7 +110,7 @@ public static class ShellScreens
         Line(nasa, "POWER, BATTERIES, ECLIPSES, GROUND CONTACT", "NASA CubeSat Launch Initiative, \"CubeSat 101\"");
         Line(nasa, "REAL MISSIONS IN THE GAME", "Landsat 9 (NASA/USGS, 2021, 705 km) · Hubble (NASA/ESA, 1990, 547 km) · Lunar Reconnaissance Orbiter (NASA, 2009, ~50 km above the Moon)");
         Line(nasa, "ARGENTINA IN SPACE (CONAE)", "SAOCOM 1A & 1B radar satellites (2018, 2020) · SAC-D/Aquarius (2011-2015): an Argentine satellite carrying NASA's instrument that measured ocean salinity");
-        Line(nasa, "REAL CASES AND ROCKETS", "Starlink loss after the Feb 2022 solar storm (NOAA/CIRES) · Rocket classes: Electron, Vega, Vega-C (ESA)");
+        Line(nasa, "REAL CASES AND ROCKETS", "Starlink orbital drag after the Feb 2022 storm (NASA SVS) · Rocket classes: Electron, Vega, Vega-C (ESA)");
         Line(nasa, "LEARN MORE", "NASA GMAT (mission analysis) · NASA Mission Viz · JPL Concept Maturity Levels · CSA Digital Games and Activities");
 
         Button(window, "CLOSE", shell.CloseCredits);
@@ -149,7 +149,7 @@ public static class ShellScreens
         Line(b, "ORBIT", "The path around Earth or the Moon. Low orbit: sharp detail, short contact. Geostationary: always in contact, far away. Lunar: around the Moon.");
         Line(b, "MARGIN", "What you have left over. If panels make 250 W and you use 160 W, your margin is 36%. Spare margin protects you from surprises: NASA Goddard's design rules require it.");
         Line(b, "FAILURE RISK", "The chance that something breaks. Thin power or mass margins push it up. If it happens, half the science is lost.");
-        Line(b, "BUDGET ($M)", "Every part, rocket and ground station costs money. Going over budget blocks the launch. Cheaper designs score higher.");
+        Line(b, "BUDGET ($M)", "Every part, rocket and ground station costs money. Going over budget blocks the launch. Reach the science goal to earn a bonus for unused budget.");
 
         Button(window, "GOT IT", shell.CloseCredits);
     }
@@ -185,18 +185,20 @@ public static class ShellScreens
     // Ventana centrada que crece con su contenido.
     static RectTransform Window(RectTransform parent, string caption, string title, float width, Color accent)
     {
-        var window = UIFactory.Card("Window", parent, accent);
-        window.anchorMin = window.anchorMax = window.pivot = new Vector2(0.5f, 0.5f);
-        window.sizeDelta = new Vector2(width, 0f);
-        UIFactory.Vertical(window.gameObject, 40, 36, 30, 34, 12f);
-        var fit = window.gameObject.AddComponent<ContentSizeFitter>();
-        fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        UIFactory.Appear(window.gameObject);
+        var frame = UIFactory.Card("Window", parent, accent);
+        frame.Find("Fill").GetComponent<Image>().color = new Color(0.035f, 0.045f, 0.065f, 0.99f);
+        UIFactory.Pin(frame, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(width, 960f));
+        UIFactory.Appear(frame.gameObject);
+        var window = UIFactory.Rect("WindowContent", frame);
+        UIFactory.Stretch(window, 30f);
+        UIFactory.Vertical(window.gameObject, 10, 10, 0, 0, 12f);
+        UILayout.ScrollContent(window);
 
         var c = UIFactory.Caption("Caption", window, caption);
         UIFactory.Layout(c.gameObject, 22f);
         var t = UIFactory.Label("Title", window, title, 38, Palette.TextMain, FontKind.Title);
         UIFactory.Layout(t.gameObject, 56f);
+        UILayout.Fit(t, 25);
         return window;
     }
 

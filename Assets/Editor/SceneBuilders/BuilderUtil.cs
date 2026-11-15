@@ -123,7 +123,7 @@ public static class BuilderUtil
         var scaler = go.GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        UILayout.Configure(scaler);
 
         var style = go.AddComponent<UIStyle>();
         style.titleFont = FindFont("ChakraPetch-Bold");

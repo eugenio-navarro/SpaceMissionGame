@@ -82,3 +82,11 @@ Motor: Unity 6.6 (6000.6.9f1) · URP
 
 - Textures by **Solar System Scope** — https://www.solarsystemscope.com/textures/ — licensed under CC BY 4.0.
 - 3D assets by **Kenney** (www.kenney.nl) — CC0.
+
+## Mission Control: Build to Launch events
+
+- NASA radar through clouds https://svs.gsfc.nasa.gov/5661
+- NASA LRO eclipse power https://www.nasa.gov/missions/nasas-lunar-reconnaissance-orbiters-dance-with-eclipses/
+- NASA storm atmospheric drag https://svs.gsfc.nasa.gov/5193/
+
+Probabilities, loss fractions and equipment statistics are simplified game values. The storm power rule is an abstraction; the historical Starlink case involved atmospheric drag.

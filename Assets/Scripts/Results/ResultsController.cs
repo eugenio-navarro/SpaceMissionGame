@@ -77,12 +77,12 @@ public class ResultsController : MonoBehaviour
         run = ResultsContext.GetOrCreate();
         if (ResultsContext.IsTestData && !string.IsNullOrEmpty(testResult)) ApplyTestResult();
         if (!run.resolved)
-            MissionOutcome.Resolve(run, (LaunchEventKind)Random.Range(0, 3), Random.Range(0f, 100f));
+            MissionOutcome.Resolve(run, MissionForecast.RollEvents(run, () => Random.Range(0f, 100f)), Random.Range(0f, 100f));
 
         SetupWorld();
         FillPanel();
         if (!ResultsContext.IsTestData && !FreeMode.On) RecordAndCheckUnlock(); // el Modo Libre no cuenta para la campaña
-        if (!ResultsContext.IsTestData) FlightLog.Record(run, SaveData.Score(run.science, run.budget, run.cost)); // la bitácora guarda todos
+        if (!ResultsContext.IsTestData) FlightLog.Record(run, SaveData.Score(run, FreeMode.On)); // la bitácora guarda todos
 
         hubButton.onClick.AddListener(() => Leave(hubScene, true));
         redesignButton.onClick.AddListener(() => Leave(hangarScene, false));
@@ -290,7 +290,7 @@ public class ResultsController : MonoBehaviour
         var next = contract != null ? Campaign.Next(contract) : null;
         bool wasLocked = next != null && !Campaign.IsUnlocked(next);
         SaveData.RecordMission(run.contractTitle, run.result, run.science, run.rocketName, run.orbitName, run.headline);
-        score = SaveData.Score(run.science, run.budget, run.cost);
+        score = SaveData.Score(run, FreeMode.On);
         scorePlace = SaveData.AddScore(run.contractTitle, score);
         if (wasLocked && Campaign.IsUnlocked(next)) newlyUnlocked = next;
     }
@@ -326,7 +326,7 @@ public class ResultsController : MonoBehaviour
     }
 
     string ScoreLine() =>
-        $"Score = science x 10 + money left: {run.science} x 10 + ${Mathf.Max(0, run.budget - run.cost)}M = {score}. " +
+        $"Score = science x 10 + success savings bonus: {run.science} x 10 + ${SaveData.EfficiencyBonus(run.budget, run.cost, run.science >= run.scienceGoal, FreeMode.On)}M = {score}. " +
         "See the full flight analysis in the Mission Archive.";
 
     void Update()

@@ -44,6 +44,7 @@ public class ResultsInfo
     [NonSerialized] public MissionDesign design;
 
     // ----- Resultado (lo completa MissionOutcome.Resolve) -----
+    public LaunchEventKind[] occurredEvents = new LaunchEventKind[0];
     public bool resolved;
     public LaunchEventKind eventKind;
     public string eventTitle;
