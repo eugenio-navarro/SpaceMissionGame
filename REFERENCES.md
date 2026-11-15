@@ -37,6 +37,13 @@ Motor: Unity 6.6 (6000.6.9f1) · URP
 |---|---|---|---|---|---|
 | [x] | Particle Pack | Kenney | CC0 | Humo y fuego del lanzamiento | https://kenney.nl/assets/particle-pack |
 
+## Fuentes
+
+| Usado | Asset | Autor | Licencia | Uso en el juego | Link |
+|---|---|---|---|---|---|
+| [x] | Chakra Petch (SemiBold, Bold) | Cadson Demak | SIL OFL 1.1 | Textos y títulos del HUD de lanzamiento | https://fonts.google.com/specimen/Chakra+Petch |
+| [x] | Share Tech Mono | Carrois Apostrophe | SIL OFL 1.1 | Números del reloj y el altímetro | https://fonts.google.com/specimen/Share+Tech+Mono |
+
 ## Paquetes de Unity
 
 | Paquete | Uso |

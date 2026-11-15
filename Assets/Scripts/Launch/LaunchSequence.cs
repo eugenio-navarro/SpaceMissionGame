@@ -170,7 +170,7 @@ public class LaunchSequence : MonoBehaviour
         }
 
         // 4. Evento
-        hud.ShowEvent(info.eventTitle, info.eventText);
+        hud.ShowEvent(info.eventTitle, info.eventText, info.eventKind == LaunchEventKind.Calm);
         for (float t = 0f; t < eventSeconds; t += Time.deltaTime)
         {
             clock += Time.deltaTime;
