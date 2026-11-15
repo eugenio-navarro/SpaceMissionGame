@@ -9,11 +9,7 @@ public class LaunchSequence : MonoBehaviour
 {
     [Header("Escena")]
     public GameObject world;
-    public Transform rocket;
-    public Transform stage1;
-    public ParticleSystem stage1Flame;
-    public ParticleSystem stage1Smoke;
-    public ParticleSystem stage2Flame;
+    public LaunchRocket[] rockets;
     public ParticleSystem padSmoke;
     public LaunchCamera launchCamera;
     public Camera cam;
@@ -44,6 +40,15 @@ public class LaunchSequence : MonoBehaviour
 
     public string nextScene = "Resultados";
 
+    [Tooltip("Solo para probar sin pasar por el Hangar: chico, mediano o grande. Vacio = lo que diga LaunchInfo.")]
+    public string testRocketId = "";
+
+    Transform rocket;
+    Transform stage1;
+    ParticleSystem stage1Flame;
+    ParticleSystem stage1Smoke;
+    ParticleSystem stage2Flame;
+
     LaunchInfo info;
     Material starsMaterial;
     bool leaving;
@@ -54,6 +59,8 @@ public class LaunchSequence : MonoBehaviour
         info = LaunchContext.GetOrCreateTestData();
         LaunchContext.LaunchFinished = false;
 
+        if (LaunchContext.IsTestData && !string.IsNullOrEmpty(testRocketId)) LaunchContext.UseTestRocket(testRocketId);
+        PickRocket(info.rocketId);
         rocketStart = rocket.position;
         hud.Setup(info);
         hud.SetClock(-countdownSeconds);
@@ -64,6 +71,30 @@ public class LaunchSequence : MonoBehaviour
 
         launchCamera.offset = camPad;
         StartCoroutine(Run());
+    }
+
+    // Deja activa solo la variante pedida y ajusta la cámara a su tamaño.
+    void PickRocket(string id)
+    {
+        LaunchRocket picked = rockets[0];
+        foreach (LaunchRocket r in rockets)
+            if (r.id == id) picked = r;
+        foreach (LaunchRocket r in rockets)
+            r.gameObject.SetActive(r == picked);
+
+        rocket = picked.transform;
+        stage1 = picked.stage1;
+        stage1Flame = picked.stage1Flame;
+        stage1Smoke = picked.stage1Smoke;
+        stage2Flame = picked.stage2Flame;
+
+        float k = Mathf.Max(0.75f, picked.height / 8f);
+        camPad *= k;
+        camAscent *= k;
+        camUpperStage *= k;
+        camOrbit *= k;
+        launchCamera.target = rocket;
+        launchCamera.lookHeight = picked.height * 0.5f;
     }
 
     void Update()

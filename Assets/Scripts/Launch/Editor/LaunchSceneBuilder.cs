@@ -58,35 +58,23 @@ public static class LaunchSceneBuilder
         }
         float padTop = pad != null ? WorldBounds(pad).max.y : 0f;
 
-        // ---------- Cohete ----------
-        GameObject rocket = new GameObject("Rocket");
-        GameObject stage1 = new GameObject("Stage1");
-        GameObject stage2 = new GameObject("Stage2");
-        stage1.transform.SetParent(rocket.transform);
-        stage2.transform.SetParent(rocket.transform);
-
-        float y = 0f;
-        y = Stack("rocket_baseA", stage1.transform, y);
-        y = Stack("rocket_fuelB", stage1.transform, y);
-        float stage2Bottom = y;
-        y = Stack("rocket_sidesA", stage2.transform, y);
-        y = Stack("rocket_fuelA", stage2.transform, y);
-        y = Stack("rocket_topA", stage2.transform, y);
-
-        float scale = y > 0.001f ? RocketHeight / y : 1f;
-        rocket.transform.localScale = Vector3.one * scale;
-        rocket.transform.position = new Vector3(0f, padTop, 0f);
-        stage2Bottom *= scale;
-
-        // ---------- Partículas ----------
-        ParticleSystem stage1Flame = Flame("Stage1Flame", stage1.transform, flameMat, 4.2f);
-        stage1Flame.transform.position = rocket.transform.position + Vector3.up * 0.4f;
-
-        ParticleSystem stage1Smoke = Smoke("Stage1Smoke", stage1.transform, smokeMat);
-        stage1Smoke.transform.position = rocket.transform.position + Vector3.up * 0.2f;
-
-        ParticleSystem stage2Flame = Flame("Stage2Flame", stage2.transform, flameMat, 2.8f);
-        stage2Flame.transform.position = rocket.transform.position + Vector3.up * stage2Bottom;
+        // ---------- Cohetes (una variante por id; la secuencia activa la que toca) ----------
+        GameObject rocketsRoot = new GameObject("Rockets");
+        Vector3 padPos = new Vector3(0f, padTop, 0f);
+        LaunchRocket[] rockets =
+        {
+            Rocket("chico", rocketsRoot.transform, padPos, 1.63f, 3.0f, flameMat, smokeMat,
+                new[] { "rocket_baseB" },
+                new[] { "rocket_fuelB", "rocket_topA" }),
+            Rocket("mediano", rocketsRoot.transform, padPos, 1.63f, 4.2f, flameMat, smokeMat,
+                new[] { "rocket_baseA", "rocket_fuelB" },
+                new[] { "rocket_sidesA", "rocket_fuelA", "rocket_topA" }),
+            Rocket("grande", rocketsRoot.transform, padPos, 1.9f, 5.6f, flameMat, smokeMat,
+                new[] { "rocket_baseA", "rocket_fuelB", "rocket_sidesB", "rocket_fuelB" },
+                new[] { "rocket_finsA", "rocket_fuelB", "rocket_topB" }),
+        };
+        LaunchRocket shown = rockets[1];
+        foreach (LaunchRocket r in rockets) r.gameObject.SetActive(r == shown);
 
         ParticleSystem padSmoke = PadSmoke("PadSmoke", world.transform, smokeMat);
         padSmoke.transform.position = new Vector3(0f, padTop + 0.3f, 0f);
@@ -110,13 +98,13 @@ public static class LaunchSceneBuilder
 
         LaunchCamera launchCam = cam.GetComponent<LaunchCamera>();
         if (launchCam == null) launchCam = cam.gameObject.AddComponent<LaunchCamera>();
-        launchCam.target = rocket.transform;
-        launchCam.lookHeight = RocketHeight * 0.5f;
+        launchCam.target = shown.transform;
+        launchCam.lookHeight = shown.height * 0.5f;
         launchCam.offset = new Vector3(7f, 1.5f, -12f);
         launchCam.positionFollower = starsGo.transform;
         launchCam.minY = padTop + 1f;
-        cam.transform.position = rocket.transform.position + launchCam.offset;
-        cam.transform.LookAt(rocket.transform.position + Vector3.up * launchCam.lookHeight);
+        cam.transform.position = shown.transform.position + launchCam.offset;
+        cam.transform.LookAt(shown.transform.position + Vector3.up * launchCam.lookHeight);
 
         // ---------- HUD ----------
         LaunchHud hud = LaunchHudBuilder.Build();
@@ -124,11 +112,7 @@ public static class LaunchSceneBuilder
         // ---------- Secuencia ----------
         GameObject director = new GameObject("LaunchSequence");
         LaunchSequence seq = director.AddComponent<LaunchSequence>();
-        seq.rocket = rocket.transform;
-        seq.stage1 = stage1.transform;
-        seq.stage1Flame = stage1Flame;
-        seq.stage1Smoke = stage1Smoke;
-        seq.stage2Flame = stage2Flame;
+        seq.rockets = rockets;
         seq.padSmoke = padSmoke;
         seq.launchCamera = launchCam;
         seq.cam = cam;
@@ -140,10 +124,43 @@ public static class LaunchSceneBuilder
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
-        Debug.Log("[LaunchSceneBuilder] Escena Lanzamiento armada. Altura del cohete sin escalar: " + y);
+        Debug.Log("[LaunchSceneBuilder] Escena Lanzamiento armada. Variantes de cohete: " + rockets.Length);
     }
 
     // ================= Modelos =================
+
+    // Arma un cohete de dos etapas apilando piezas de Kenney, con su fuego y humo.
+    static LaunchRocket Rocket(string id, Transform parent, Vector3 position, float scale, float flameSize,
+        Material flameMat, Material smokeMat, string[] stage1Parts, string[] stage2Parts)
+    {
+        GameObject rocket = new GameObject("Rocket_" + id);
+        rocket.transform.SetParent(parent, false);
+        GameObject stage1 = new GameObject("Stage1");
+        GameObject stage2 = new GameObject("Stage2");
+        stage1.transform.SetParent(rocket.transform, false);
+        stage2.transform.SetParent(rocket.transform, false);
+
+        float y = 0f;
+        foreach (string part in stage1Parts) y = Stack(part, stage1.transform, y);
+        float stage2Bottom = y * scale;
+        foreach (string part in stage2Parts) y = Stack(part, stage2.transform, y);
+
+        rocket.transform.localScale = Vector3.one * scale;
+        rocket.transform.position = position;
+
+        LaunchRocket info = rocket.AddComponent<LaunchRocket>();
+        info.id = id;
+        info.height = y * scale;
+        info.stage1 = stage1.transform;
+
+        info.stage1Flame = Flame("Stage1Flame", stage1.transform, flameMat, flameSize);
+        info.stage1Flame.transform.position = position + Vector3.up * 0.4f;
+        info.stage1Smoke = Smoke("Stage1Smoke", stage1.transform, smokeMat);
+        info.stage1Smoke.transform.position = position + Vector3.up * 0.2f;
+        info.stage2Flame = Flame("Stage2Flame", stage2.transform, flameMat, flameSize * 0.66f);
+        info.stage2Flame.transform.position = position + Vector3.up * stage2Bottom;
+        return info;
+    }
 
     static GameObject Model(string name, Transform parent)
     {

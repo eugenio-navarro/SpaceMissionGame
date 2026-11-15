@@ -15,7 +15,8 @@ public enum LaunchEventKind
 public class LaunchInfo
 {
     public string missionName = "Observe the Earth";
-    public string rocketName = "Small rocket";
+    public string rocketId = "mediano"; // chico, mediano o grande (ids del README)
+    public string rocketName = "Medium rocket";
     public string orbitName = "Low Earth orbit";
     public float orbitAltitudeKm = 500f;
     public string[] stageNames = { "Stage 1 - Booster", "Stage 2 - Upper stage", "Payload - Satellite" };
@@ -32,11 +33,22 @@ public static class LaunchContext
     // Queda en true cuando la secuencia terminó o se saltó. Lo puede leer Resultados.
     public static bool LaunchFinished;
 
+    // True cuando Current salió de GetOrCreateTestData y no de una partida real.
+    public static bool IsTestData;
+
+    public static void UseTestRocket(string id)
+    {
+        if (Current == null) return;
+        Current.rocketId = id;
+        Current.rocketName = id == "chico" ? "Small rocket" : id == "grande" ? "Large rocket" : "Medium rocket";
+    }
+
     public static LaunchInfo GetOrCreateTestData()
     {
         if (Current != null) return Current;
 
         var info = new LaunchInfo();
+        IsTestData = true;
         int roll = UnityEngine.Random.Range(0, 3);
         if (roll == 1)
         {
