@@ -454,7 +454,7 @@ Detalle completo en **`REFERENCES.md`**: hay que anotar cada asset al bajarlo.
 
 - **Objetivo:** juego educativo de diseño de misiones espaciales para NASA Space Apps 2026. Hay que entregar en menos de 48 h: **priorizá que funcione sobre que sea perfecto**.
 - **Unity 6000.6.9f1, URP, WebGL.** Usá APIs de Unity 6:
-  - `FindFirstObjectByType` en vez de `FindObjectOfType`.
+  - `FindAnyObjectByType` en vez de `FindObjectOfType` (en 6.6 `FindFirstObjectByType` y `FindObjectsSortMode` están obsoletos).
   - El Input System nuevo es el default, así que la UI va con `InputSystemUIInputModule` en el EventSystem.
 - **WebGL:** nada de hilos, nada de `System.IO` para guardar (usar `PlayerPrefs`) y cuidado con el peso de texturas y modelos.
 - **Datos en ScriptableObjects** (sección 4). No hardcodees valores de piezas en scripts.
