@@ -51,15 +51,15 @@ public static class TestCatalog
     public static readonly List<ContractSpec> Contracts = new List<ContractSpec>
     {
         new ContractSpec { id = "earth", title = "Observe the Earth", destination = "EARTH", objective = "Track changes in forests and ice.",
-            scienceGoal = 60, budget = 300, unlocked = true, similarMission = "Landsat",
+            scienceGoal = 60, budget = 300, unlocked = true, similarMission = "Landsat", similarMissionInfo = "NASA and USGS satellites watching Earth's forests, ice and cities since 1972.",
             allowedOrbits = new[] { "leo", "geo" }, lockedInstruments = new string[0],
             detail = new Dictionary<string, float> { { "leo", 1.5f }, { "geo", 0.8f } } },
         new ContractSpec { id = "telescope", title = "Space Telescope", destination = "DEEP SPACE", objective = "Study faraway galaxies.",
-            scienceGoal = 70, budget = 400, unlocked = false, similarMission = "Hubble",
+            scienceGoal = 70, budget = 400, unlocked = false, similarMission = "Hubble", similarMissionInfo = "A space telescope in low orbit since 1990, looking at faraway galaxies.",
             allowedOrbits = new[] { "leo", "geo" }, lockedInstruments = new[] { "radar" },
             detail = new Dictionary<string, float> { { "leo", 0.9f }, { "geo", 1.0f } } },
         new ContractSpec { id = "moon", title = "Explore the Moon", destination = "MOON", objective = "Map the lunar south pole.",
-            scienceGoal = 40, budget = 500, unlocked = false, similarMission = "Lunar Reconnaissance Orbiter",
+            scienceGoal = 40, budget = 500, unlocked = false, similarMission = "Lunar Reconnaissance Orbiter", similarMissionInfo = "NASA orbiter mapping the Moon in detail since 2009, poles included.",
             allowedOrbits = new[] { "lunar" }, lockedInstruments = new string[0],
             detail = new Dictionary<string, float> { { "lunar", 1.2f } } },
     };

@@ -12,11 +12,25 @@ public class HangarController : MonoBehaviour
     public ContractSpec Contract { get; private set; }
     public MissionReport Report { get; private set; }
 
+    // TEMPORAL hasta que exista MissionState: el último diseño lanzado (lo leen Resultados y "Try again").
+    public static MissionDesign LastDesign;
+
     public event Action Changed;
 
     void Awake()
     {
         Contract = TestCatalog.Contract(HubController.AcceptedContractId);
+        if (LastDesign != null)
+        {
+            var d = LastDesign;
+            Design.instruments.AddRange(d.instruments);
+            Design.panel = d.panel;
+            Design.battery = d.battery;
+            Design.antenna = d.antenna;
+            Design.rocket = d.rocket;
+            Design.orbit = d.orbit;
+            Design.stations = d.stations;
+        }
         Recalculate();
     }
 
@@ -73,7 +87,9 @@ public class HangarController : MonoBehaviour
 
     public void Launch()
     {
-        if (Report.CanLaunch) SceneManager.LoadScene(launchScene);
+        if (!Report.CanLaunch) return;
+        LastDesign = OutcomeCalculator.Clone(Design);
+        SceneManager.LoadScene(launchScene);
     }
 
     public void BackToHub() => SceneManager.LoadScene(hubScene);
