@@ -102,6 +102,13 @@ public static class HubUIBuilder
         UIFactory.Place(header.rectTransform, new Vector2(0f, 1f), Vector2.one, new Vector2(36f, -108f), new Vector2(-100f, -54f));
         CloseButton(window, hub);
 
+        // Modo Libre: todos los contratos, sin límite de presupuesto
+        hub.freeModeButton = UIFactory.ButtonCard("FreeMode", window, "FREE MODE: OFF", 22, null, null, false);
+        UIFactory.Pin((RectTransform)hub.freeModeButton.transform, Vector2.one, new Vector2(-92f, -20f), new Vector2(280f, 56f));
+        UnityEventTools.AddPersistentListener(hub.freeModeButton.onClick, hub.ToggleFreeMode);
+        hub.freeModeHint = UIFactory.Label("FreeModeHint", window, "", 18, Palette.TextSecondary, FontKind.Body, TextAnchor.MiddleRight);
+        UIFactory.Place(hub.freeModeHint.rectTransform, new Vector2(0.4f, 1f), Vector2.one, new Vector2(0f, -112f), new Vector2(-40f, -80f));
+
         var cards = UIFactory.Rect("Cards", window);
         UIFactory.Place(cards, Vector2.zero, Vector2.one, new Vector2(36f, 36f), new Vector2(-36f, -130f));
         var row = cards.gameObject.AddComponent<HorizontalLayoutGroup>();

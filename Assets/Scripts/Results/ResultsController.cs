@@ -77,7 +77,7 @@ public class ResultsController : MonoBehaviour
 
         SetupWorld();
         FillPanel();
-        if (!ResultsContext.IsTestData) RecordAndCheckUnlock();
+        if (!ResultsContext.IsTestData && !FreeMode.On) RecordAndCheckUnlock(); // el Modo Libre no cuenta para la campaña
 
         hubButton.onClick.AddListener(() => Leave(hubScene, true));
         redesignButton.onClick.AddListener(() => Leave(hangarScene, false));
@@ -142,7 +142,7 @@ public class ResultsController : MonoBehaviour
         resultHeadline.text = run.headline;
 
         missionName.text = run.contractTitle;
-        missionDetail.text = run.rocketName + "  /  " + run.orbitName;
+        missionDetail.text = run.rocketName + "  /  " + run.orbitName + (FreeMode.On ? "  /  Free mode" : "");
 
         // Barra de ciencia: el ancho total representa 1,5 veces la meta.
         float scale = Mathf.Max(1f, run.scienceGoal * 1.5f);

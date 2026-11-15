@@ -110,7 +110,7 @@ public class HangarController : MonoBehaviour
 
     void Recalculate()
     {
-        Report = MissionCalculator.Evaluate(Design, Contract);
+        Report = MissionCalculator.Evaluate(Design, Contract, FreeMode.On);
         SaveData.SaveDesign(Contract.id, Design);
         Changed?.Invoke();
     }

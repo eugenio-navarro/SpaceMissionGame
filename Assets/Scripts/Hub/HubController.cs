@@ -29,6 +29,8 @@ public class HubController : MonoBehaviour
     public Button[] contractButtons; // uno por contrato, en el orden de TestCatalog.Contracts
     public Text[] contractStatus;
     public Image[] contractAccents;
+    public Button freeModeButton;
+    public Text freeModeHint;
 
     float toastUntil;
     CanvasGroup toastGroup;
@@ -152,7 +154,7 @@ public class HubController : MonoBehaviour
     public void AcceptContract(int index)
     {
         var contract = TestCatalog.Contracts[index];
-        if (!Campaign.IsUnlocked(contract)) return;
+        if (!CanAccept(contract)) return;
         AcceptedContractId = contract.id;
         CloseAll();
         RefreshStatus();
@@ -168,13 +170,31 @@ public class HubController : MonoBehaviour
         if (archivePanel != null) archivePanel.gameObject.SetActive(false);
     }
 
+    // En Modo Libre se puede aceptar cualquier contrato; en campaña, solo los desbloqueados.
+    static bool CanAccept(ContractSpec c) => FreeMode.On || Campaign.IsUnlocked(c);
+
+    public void ToggleFreeMode()
+    {
+        FreeMode.On = !FreeMode.On;
+        // Al volver a la campaña, un contrato todavía bloqueado deja de estar aceptado.
+        if (!FreeMode.On && !string.IsNullOrEmpty(AcceptedContractId) && !Campaign.IsUnlocked(TestCatalog.Contract(AcceptedContractId)))
+            AcceptedContractId = "";
+        RefreshContracts();
+        RefreshStatus();
+    }
+
     // Estado de cada tarjeta de contrato según la campaña: bloqueado, disponible, aceptado o completado.
     void RefreshContracts()
     {
+        freeModeButton.GetComponentInChildren<Text>().text = FreeMode.On ? "FREE MODE: ON" : "FREE MODE: OFF";
+        freeModeButton.GetComponent<CardButtonFx>().SetActive(FreeMode.On);
+        freeModeHint.text = FreeMode.On
+            ? "Experiment freely: no budget limit, all contracts open. Results don't count for the campaign."
+            : "";
         for (int i = 0; i < contractButtons.Length; i++)
         {
             var c = TestCatalog.Contracts[i];
-            bool open = Campaign.IsUnlocked(c);
+            bool open = CanAccept(c);
             bool accepted = c.id == AcceptedContractId;
             int rank = SaveData.BestRank(c.title);
 
@@ -184,7 +204,8 @@ public class HubController : MonoBehaviour
             contractAccents[i].color = open ? Palette.Orange : Palette.Dim;
 
             var status = contractStatus[i];
-            if (!open) { status.text = $"UNLOCKS AFTER {Campaign.Previous(c)?.title.ToUpperInvariant()}"; status.color = Palette.Dim; }
+            if (FreeMode.On) { status.text = accepted ? "FREE MODE · CURRENT CONTRACT" : "FREE MODE · NO BUDGET LIMIT"; status.color = Palette.Blue; }
+            else if (!open) { status.text = $"UNLOCKS AFTER {Campaign.Previous(c)?.title.ToUpperInvariant()}"; status.color = Palette.Dim; }
             else if (rank == 3) { status.text = $"COMPLETED · BEST {SaveData.BestScience(c.title)} SCIENCE"; status.color = Palette.Green; }
             else if (rank > 0) { status.text = $"NOT DONE YET · BEST {SaveData.BestScience(c.title)} SCIENCE"; status.color = Palette.Orange; }
             else if (accepted) { status.text = "CURRENT CONTRACT · GO TO THE HANGAR"; status.color = Palette.Green; }
@@ -204,7 +225,9 @@ public class HubController : MonoBehaviour
         }
         contractTitle.text = c.title;
         contractTitle.color = Palette.TextMain;
-        contractDetail.text = $"Goal {c.scienceGoal} science  ·  Budget ${c.budget}M";
+        contractDetail.text = FreeMode.On
+            ? $"Goal {c.scienceGoal} science  ·  Free mode"
+            : $"Goal {c.scienceGoal} science  ·  Budget ${c.budget}M";
     }
 
     void Toast(string message)

@@ -21,6 +21,7 @@ public class HangarUI : MonoBehaviour
 
     int currentTab;
     float clearArmedUntil;
+    MissionReview review;
     Text clearLabel;
     static string Orange => Palette.Tag(Palette.Orange);
     static string Green => Palette.Tag(Palette.Green);
@@ -33,7 +34,10 @@ public class HangarUI : MonoBehaviour
             int tab = i;
             tabButtons[i].onClick.AddListener(() => ShowTab(tab));
         }
-        launchButton.onClick.AddListener(controller.Launch);
+        // LAUNCH abre la revisión previa (MEL + mapa de la órbita); desde ahí se confirma.
+        review = MissionReview.Create(launchButton.GetComponentInParent<Canvas>().rootCanvas.transform, controller);
+        launchButton.onClick.AddListener(review.Open);
+        GameShell.SceneEscape = CloseReview;
         backButton.onClick.AddListener(controller.BackToHub);
         controller.Changed += Refresh;
         if (clearButton != null)
@@ -78,8 +82,16 @@ public class HangarUI : MonoBehaviour
         }
     }
 
+    bool CloseReview()
+    {
+        if (review == null || !review.IsOpen) return false;
+        review.Close();
+        return true;
+    }
+
     void OnDestroy()
     {
+        if (GameShell.SceneEscape == CloseReview) GameShell.SceneEscape = null;
         if (controller != null) controller.Changed -= Refresh;
     }
 
@@ -97,12 +109,15 @@ public class HangarUI : MonoBehaviour
         var c = controller.Contract;
 
         contractTitle.text = c.title;
-        contractDetail.text = $"Goal {c.scienceGoal} science  ·  Budget ${c.budget}M";
+        contractDetail.text = FreeMode.On
+            ? $"Goal {c.scienceGoal} science  ·  <color={Palette.Tag(Palette.Blue)}>Free mode</color>"
+            : $"Goal {c.scienceGoal} science  ·  Budget ${c.budget}M";
 
         massBar.Set(r.mass, r.capacity, r.capacity > 0f ? $"{r.mass:0} / {r.capacity:0} kg" : $"{r.mass:0} kg");
         powerBar.Set(r.consumption, r.generation, r.generation > 0f ? $"{r.consumption:0} / {r.generation:0} W" : $"{r.consumption:0} W");
         dataBar.Set(r.dataGenerated, r.downlink, $"{r.dataGenerated:0} / {r.downlink:0} GB/day", 1f);
-        costBar.Set(r.cost, c.budget, $"${r.cost}M / ${c.budget}M", 1f);
+        if (FreeMode.On) costBar.Set(r.cost, 0f, $"${r.cost}M · no limit");
+        else costBar.Set(r.cost, c.budget, $"${r.cost}M / ${c.budget}M", 1f);
 
         scienceText.text = $"{r.science}<color={Secondary}>/{c.scienceGoal}</color>";
         scienceText.color = r.science >= c.scienceGoal ? Palette.Green : Palette.Orange;
@@ -115,8 +130,8 @@ public class HangarUI : MonoBehaviour
         alertsText.text = alerts.Length > 0 ? alerts.ToString() : $"<color={Green}>All good. No alerts.</color>";
 
         int left = c.budget - r.cost;
-        fundsText.text = left >= 0 ? $"${left}M" : $"-${-left}M";
-        fundsText.color = left >= 0 ? Palette.Green : Palette.Orange;
+        fundsText.text = FreeMode.On ? "FREE" : left >= 0 ? $"${left}M" : $"-${-left}M";
+        fundsText.color = FreeMode.On ? Palette.Blue : left >= 0 ? Palette.Green : Palette.Orange;
 
         launchButton.interactable = r.CanLaunch;
         launchReasonText.text = r.CanLaunch ? "All systems go!" : r.blockers[0];
