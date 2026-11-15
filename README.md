@@ -286,11 +286,11 @@ El challenge pide explicar en simple, presentar los conceptos jugando y enseñar
 ### Bonus
 
 - [ ] Modo equipo por turnos (de 2 a 4)
-- [ ] Modo Libre
-- [ ] Ranking local (PlayerPrefs)
+- [x] Modo Libre
+- [x] Ranking local (PlayerPrefs)
 - [ ] Misión real parecida en los resultados
 - [x] Tutorial guiado
-- [ ] Mini desafío de separación de etapas (apretar espacio en el momento justo)
+- [x] Mini desafío de separación de etapas (apretar espacio en el momento justo)
 
 ### Fuera de alcance
 

@@ -53,6 +53,8 @@ public class LaunchSequence : MonoBehaviour
     Material starsMaterial;
     bool leaving;
     Vector3 rocketStart;
+    SeparationChallenge challenge;
+    bool separateRequested; // el jugador apretó Espacio o hizo clic en la tarjeta del desafío
 
     void Start()
     {
@@ -75,6 +77,8 @@ public class LaunchSequence : MonoBehaviour
         hud.Setup(info);
         hud.SetClock(-countdownSeconds);
         if (hud.skipButton != null) hud.skipButton.onClick.AddListener(Skip);
+        challenge = SeparationChallenge.Create(hud.fade.canvas.rootCanvas.transform, RequestSeparation);
+        challenge.transform.SetSiblingIndex(hud.fade.transform.GetSiblingIndex()); // debajo del fundido
 
         if (starsRenderer != null) starsMaterial = starsRenderer.material;
         SetSky(0f);
@@ -109,10 +113,17 @@ public class LaunchSequence : MonoBehaviour
 
     void Update()
     {
-        // Esc abre la pausa (GameShell); Espacio saltea el lanzamiento.
+        // Esc abre la pausa (GameShell); Espacio suelta la etapa 1 (mini desafío); Enter saltea.
         if (GameShell.Instance != null && GameShell.Instance.MenuOpen) return;
         Keyboard kb = Keyboard.current;
-        if (kb != null && kb.spaceKey.wasPressedThisFrame) Skip();
+        if (kb == null) return;
+        if (kb.spaceKey.wasPressedThisFrame) RequestSeparation();
+        if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame) Skip();
+    }
+
+    void RequestSeparation()
+    {
+        if (challenge != null && challenge.Active) separateRequested = true;
     }
 
     public void Skip()
@@ -146,6 +157,10 @@ public class LaunchSequence : MonoBehaviour
         // 2. Ascenso (etapa 1 + etapa 2)
         float total = stage1Seconds + stage2Seconds;
         bool separated = false;
+        bool challengeStarted = false;
+        float windowStart = stage1Seconds - 1.6f, windowEnd = stage1Seconds + 0.7f;
+        string separationMessage = "Stage separation: the empty booster drops away";
+        float separatedAt = 0f;
         float stage1Velocity = 0f;
         float stage1Timer = 0f;
         launchCamera.offset = camAscent;
@@ -164,13 +179,29 @@ public class LaunchSequence : MonoBehaviour
             launchCamera.shake = Mathf.Lerp(0.12f, 0f, p * 2f);
 
             if (t < 2.5f) hud.SetStatus("Liftoff!");
+            else if (separated) hud.SetStatus(t < separatedAt + 2.5f ? separationMessage : "Leaving the atmosphere");
             else if (t < stage1Seconds - 2f) hud.SetStatus("Max Q: the air pushes hardest on the rocket");
             else if (t < stage1Seconds) hud.SetStatus("Stage 1 is almost out of fuel");
-            else if (t < stage1Seconds + 2.5f) hud.SetStatus("Stage separation: the empty booster drops away");
-            else hud.SetStatus("Leaving the atmosphere");
+            else hud.SetStatus("Stage 1 is out of fuel: separate it now!");
 
-            if (!separated && t >= stage1Seconds)
+            // Mini desafío: el jugador suelta la etapa 1; si no lo hace, la computadora la suelta sola.
+            if (!separated && !challengeStarted && t >= windowStart)
             {
+                challengeStarted = true;
+                challenge.Begin(windowStart, windowEnd, stage1Seconds);
+            }
+            if (challengeStarted) challenge.Tick(t);
+
+            if (!separated && challengeStarted && (separateRequested || t >= windowEnd))
+            {
+                var rating = separateRequested ? SeparationChallenge.Rate(t, stage1Seconds) : SeparationRating.Automatic;
+                LaunchContext.Separation = rating;
+                challenge.Finish(rating);
+                GameShell.Play(rating == SeparationRating.Perfect ? Sfx.Accept : Sfx.Click);
+                separationMessage = rating == SeparationRating.Perfect ? "Perfect separation! The empty booster drops away"
+                    : rating == SeparationRating.Automatic ? "Automatic separation: the flight computer dropped the booster"
+                    : "Stage separation: the empty booster drops away";
+                separatedAt = t;
                 separated = true;
                 stage1Flame.Stop();
                 stage1Smoke.Stop();

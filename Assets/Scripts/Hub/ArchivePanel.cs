@@ -8,7 +8,7 @@ public class ArchivePanel : MonoBehaviour
     class Row
     {
         public Image chip, fill;
-        public Text title, status, science, last;
+        public Text title, status, science, last, top;
         public RectTransform fillRect;
     }
 
@@ -70,6 +70,9 @@ public class ArchivePanel : MonoBehaviour
                 row.last.text = $"Last flight: {last.rocket} · {last.orbit} · <color={color}>{result}</color>, {last.science} science. {last.headline}";
             }
 
+            var top = SaveData.TopScores(c.title);
+            row.top.text = top.Length == 0 ? "" : "TOP SCORES  " + string.Join(" · ", top);
+
             if (i > 0 && open) unlocked.Append(unlocked.Length > 0 ? ", " : "").Append(c.title);
         }
 
@@ -128,7 +131,15 @@ public class ArchivePanel : MonoBehaviour
         UIFactory.Place(scienceCaption.rectTransform, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-260f, 16f), new Vector2(-24f, 38f));
 
         row.last = UIFactory.Label("Last", card, "", 19, Palette.TextSecondary, FontKind.Body, TextAnchor.LowerLeft);
-        UIFactory.Place(row.last.rectTransform, Vector2.zero, new Vector2(1f, 0.5f), new Vector2(x, 12f), new Vector2(-24f, -14f));
+        UIFactory.Place(row.last.rectTransform, Vector2.zero, new Vector2(1f, 0.5f), new Vector2(x, 12f), new Vector2(-330f, -14f));
+
+        // Ranking local: los 5 mejores puntajes del contrato
+        row.top = UIFactory.Label("Top", card, "", 17, Palette.Blue, FontKind.Title, TextAnchor.LowerRight);
+        UIFactory.Place(row.top.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 0.5f), new Vector2(-320f, 12f), new Vector2(-24f, -14f));
+        row.top.verticalOverflow = VerticalWrapMode.Truncate;
+        row.top.resizeTextForBestFit = true;
+        row.top.resizeTextMinSize = 12;
+        row.top.resizeTextMaxSize = 17;
         row.last.verticalOverflow = VerticalWrapMode.Truncate;
         row.last.resizeTextForBestFit = true;
         row.last.resizeTextMinSize = 14;

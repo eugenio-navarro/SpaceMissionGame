@@ -89,6 +89,32 @@ public static class SaveData
         public int science;
     }
 
+    // ---------- Ranking local ----------
+    // Puntaje = ciencia x 10 + millones que sobraron del presupuesto (premia hacer más con menos).
+
+    public static int Score(int science, int budget, int cost) => science * 10 + Mathf.Max(0, budget - cost);
+
+    // Guarda el puntaje en el top 5 del contrato. Devuelve el puesto (1 a 5) o 0 si no entró.
+    public static int AddScore(string contractTitle, int score)
+    {
+        var list = new System.Collections.Generic.List<int>(TopScores(contractTitle)) { score };
+        list.Sort((a, b) => b.CompareTo(a));
+        if (list.Count > 5) list.RemoveRange(5, list.Count - 5);
+        PlayerPrefs.SetString("top_" + contractTitle, string.Join(",", list));
+        PlayerPrefs.Save();
+        return list.IndexOf(score) + 1;
+    }
+
+    public static int[] TopScores(string contractTitle)
+    {
+        string raw = PlayerPrefs.GetString("top_" + contractTitle, "");
+        if (raw.Length == 0) return new int[0];
+        var parts = raw.Split(',');
+        var result = new int[parts.Length];
+        for (int i = 0; i < parts.Length; i++) int.TryParse(parts[i], out result[i]);
+        return result;
+    }
+
     public static int BestRank(string contractTitle) => PlayerPrefs.GetInt("best_" + contractTitle, 0);
     public static int BestScience(string contractTitle) => PlayerPrefs.GetInt("best_" + contractTitle + "_science", 0);
 

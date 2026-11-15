@@ -50,4 +50,7 @@ public static class LaunchContext
 {
     // Queda en true cuando la secuencia terminó o se saltó. Lo puede leer Resultados.
     public static bool LaunchFinished;
+
+    // Cómo le fue al jugador en el mini desafío de separación de etapas.
+    public static SeparationRating Separation = SeparationRating.Automatic;
 }

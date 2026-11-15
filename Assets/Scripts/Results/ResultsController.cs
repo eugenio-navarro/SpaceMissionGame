@@ -263,6 +263,7 @@ public class ResultsController : MonoBehaviour
     }
 
     ContractSpec newlyUnlocked; // contrato que se abrió con esta misión (se anuncia al final de la intro)
+    int score, scorePlace;      // ranking local: puntaje de este vuelo y puesto en el top 5 (0 = no entró)
 
     void RecordAndCheckUnlock()
     {
@@ -270,19 +271,19 @@ public class ResultsController : MonoBehaviour
         var next = contract != null ? Campaign.Next(contract) : null;
         bool wasLocked = next != null && !Campaign.IsUnlocked(next);
         SaveData.RecordMission(run.contractTitle, run.result, run.science, run.rocketName, run.orbitName, run.headline);
+        score = SaveData.Score(run.science, run.budget, run.cost);
+        scorePlace = SaveData.AddScore(run.contractTitle, score);
         if (wasLocked && Campaign.IsUnlocked(next)) newlyUnlocked = next;
     }
 
     // Éxito: papelitos y fanfarria. Parcial: jingle corto. Falla: temblor y destello naranja.
+    // Después, si corresponde, avisa el contrato desbloqueado o el puesto en el ranking.
     void Celebrate()
     {
         if (run.result == ResultKind.Success)
         {
             GameShell.Confetti();
             GameShell.Play(Sfx.Success);
-            if (newlyUnlocked != null)
-                GameShell.Announce("NEW CONTRACT UNLOCKED", newlyUnlocked.title,
-                    $"{newlyUnlocked.objective} Accept it at Mission Control in the Space Center.", 1.4f);
         }
         else if (run.result == ResultKind.Partial)
         {
@@ -295,7 +296,19 @@ public class ResultsController : MonoBehaviour
             var cam = FindAnyObjectByType<ResultsCamera>();
             if (cam != null) cam.Shake(0.5f);
         }
+
+        if (newlyUnlocked != null)
+            GameShell.Announce("NEW CONTRACT UNLOCKED", newlyUnlocked.title,
+                $"{newlyUnlocked.objective} Accept it at Mission Control in the Space Center.\n\n{ScoreLine()}", 1.4f);
+        else if (scorePlace == 1)
+            GameShell.Announce("NEW RECORD", $"Score {score}", $"Your best flight for {run.contractTitle}!\n\n{ScoreLine()}", 1.4f);
+        else if (scorePlace > 1)
+            GameShell.Announce("TOP 5 FLIGHT", $"Score {score}  ·  #{scorePlace}", ScoreLine(), 1.4f);
     }
+
+    string ScoreLine() =>
+        $"Score = science x 10 + money left: {run.science} x 10 + ${Mathf.Max(0, run.budget - run.cost)}M = {score}. " +
+        "See the ranking in the Mission Archive.";
 
     void Update()
     {
