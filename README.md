@@ -4,7 +4,7 @@
 >
 > **Mission Control: Build to Launch** is a browser game for the NASA Space Apps Challenge 2026 challenge "Space Mission Design Game", made by team **Hell0 World!** (Buenos Aires).
 >
-> - **Play it:** ITCH_URL (runs in the browser, no install).
+> - **Play it:** https://eugenio-navarro.itch.io/mission-control-build-to-launch (runs in the browser, no install).
 > - **How to play:** pick a contract at Mission Control (Landsat, Hubble or LRO-style missions), build a satellite in the Assembly Hangar (instruments, power, rocket and orbit, comms), review the equipment list (MEL) and launch. Results explain *why* the mission worked or failed, compare it with a real mission (Landsat 9, Hubble, LRO or Argentina's SAOCOM) and suggest one change to try. Every flight is saved in the Mission Archive with what went well, what went wrong and the lesson.
 > - **For every level:** step-by-step tutorial, a Mission Guide with the key concepts, three difficulty levels (Cadet, Engineer, Flight Director) and a Free Mode sandbox.
 > - **Controls:** mouse. Esc: menu. Space: separate the rocket stage. Enter: skip the launch.
@@ -449,8 +449,8 @@ Detalle completo en **`REFERENCES.md`**: hay que anotar cada asset al bajarlo.
 
 - [ ] Proyecto en la pestaña *Project* del equipo en Space Apps
 - [ ] Todos los campos obligatorios completos
-- [ ] Link a la build jugable (itch.io)
-- [ ] Link al repo de GitHub (público o con acceso para los jueces)
+- [x] Link a la build jugable (itch.io): https://eugenio-navarro.itch.io/mission-control-build-to-launch
+- [x] Link al repo de GitHub (público): https://github.com/eugenio-navarro/SpaceMissionGame
 - [ ] Video demo corto, con subtítulos en inglés si está en español
 - [ ] *References* completo (copiar de `REFERENCES.md`)
 - [x] Uso de IA declarado (README y REFERENCES.md)
