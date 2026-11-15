@@ -138,6 +138,7 @@ public static class SaveData
     {
         PlayerPrefs.DeleteKey("seen_tut_hub");
         PlayerPrefs.DeleteKey("seen_tut_hangar");
+        PlayerPrefs.DeleteKey("seen_tut_free");
         PlayerPrefs.Save();
     }
 

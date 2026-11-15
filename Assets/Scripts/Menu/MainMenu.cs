@@ -71,7 +71,7 @@ public class MainMenu : MonoBehaviour
         const float left = 120f, width = 470f;
 
         var column = UIFactory.Rect("Column", canvasRoot);
-        UIFactory.Place(column, Vector2.zero, new Vector2(0f, 1f), new Vector2(left, 70f), new Vector2(left + width, -70f));
+        UIFactory.Place(column, Vector2.zero, new Vector2(0f, 1f), new Vector2(left, 36f), new Vector2(left + width, -36f));
         var v = UIFactory.Vertical(column.gameObject, 0, 0, 0, 0, 10f);
         v.childAlignment = TextAnchor.MiddleLeft;
         UIFactory.Appear(column.gameObject);
@@ -92,28 +92,18 @@ public class MainMenu : MonoBehaviour
         Button(column, progress ? "CONTINUE" : "PLAY", Play, 66f, 32, true);
         if (progress) Button(column, "NEW GAME", NewGame);
 
-        levelLabel = Button(column, "", () =>
-        {
-            Difficulty.Next();
-            Refresh();
-            Say(Difficulty.Summary);
-        }).GetComponentInChildren<Text>();
-        freeLabel = Button(column, "", () =>
-        {
-            FreeMode.Toggle();
-            Refresh();
-            Say(FreeMode.On
-                ? "Free mode ON: every contract is open and there is no budget limit. Flights don't count for the campaign."
-                : "Free mode OFF: campaign. Complete a contract to unlock the next one.");
-        }).GetComponentInChildren<Text>();
-        tutorialLabel = Button(column, "", () =>
-        {
-            SaveData.TutorialOn = !SaveData.TutorialOn;
-            Refresh();
-            Say(SaveData.TutorialOn
-                ? "Tutorial ON: a guide will walk you through your first mission, step by step."
-                : "Tutorial OFF: no step-by-step guide. The Mission Guide is always in the Esc menu.");
-        }).GetComponentInChildren<Text>();
+        // Al pasar el mouse (y al cambiar la opción) se explica la diferencia entre las alternativas.
+        var level = Button(column, "", () => { Difficulty.Next(); Refresh(); Say(LevelHelp()); });
+        levelLabel = level.GetComponentInChildren<Text>();
+        OnHover(level, LevelHelp);
+
+        var free = Button(column, "", () => { FreeMode.Toggle(); Refresh(); Say(ModeHelp()); });
+        freeLabel = free.GetComponentInChildren<Text>();
+        OnHover(free, ModeHelp);
+
+        var tutorial = Button(column, "", () => { SaveData.TutorialOn = !SaveData.TutorialOn; Refresh(); Say(TutorialHelp()); });
+        tutorialLabel = tutorial.GetComponentInChildren<Text>();
+        OnHover(tutorial, TutorialHelp);
 
         Button(column, "HOW TO PLAY", () => GameShell.Instance.OpenGuide());
         Button(column, "OPTIONS", () => GameShell.Instance.OpenOptions());
@@ -123,12 +113,41 @@ public class MainMenu : MonoBehaviour
 #endif
 
         // Explicación de la última opción tocada
-        hint = UIFactory.Label("Hint", column, Difficulty.Summary, 18, Palette.TextSecondary, FontKind.Body, TextAnchor.UpperLeft);
-        UIFactory.Layout(hint.gameObject, 70f);
+        hint = UIFactory.Label("Hint", column, "Hover LEVEL, FREE MODE or TUTORIAL to see what each option does.", 17, Palette.TextSecondary, FontKind.Body, TextAnchor.UpperLeft);
+        UIFactory.Layout(hint.gameObject, 150f);
+        hint.verticalOverflow = VerticalWrapMode.Truncate;
+        hint.resizeTextForBestFit = true;
+        hint.resizeTextMinSize = 13;
+        hint.resizeTextMaxSize = 17;
 
         var team = UIFactory.Label("Team", canvasRoot, "Hell0 World!  ·  Buenos Aires  ·  Made with NASA open resources", 16, Palette.TextSecondary, FontKind.Body, TextAnchor.UpperRight);
         UIFactory.Place(team.rectTransform, new Vector2(0.4f, 1f), Vector2.one, new Vector2(0f, -64f), new Vector2(-36f, -32f));
     }
+
+    void OnHover(Button button, System.Func<string> text)
+    {
+        var trigger = button.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+        var entry = new UnityEngine.EventSystems.EventTrigger.Entry { eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter };
+        entry.callback.AddListener(_ => Say(text()));
+        trigger.triggers.Add(entry);
+    }
+
+    // La opción elegida va en naranja; las otras, en gris, para comparar.
+    static string Option(bool current, string name, string text) =>
+        (current ? "<color=#F0782A><b>" + name + "</b></color>" : "<b>" + name + "</b>") + "  " + text;
+
+    static string LevelHelp() =>
+        Option(Difficulty.Level == DifficultyLevel.Cadet, "CADET", "Beginner. +25% budget, half the risk, and you start with a design that already flies.") + "\n" +
+        Option(Difficulty.Level == DifficultyLevel.Engineer, "ENGINEER", "Standard budget and risk. You build from scratch.") + "\n" +
+        Option(Difficulty.Level == DifficultyLevel.FlightDirector, "FLIGHT DIRECTOR", "Expert. 15% less budget and 50% more risk.");
+
+    static string ModeHelp() =>
+        Option(!FreeMode.On, "CAMPAIGN (free mode off)", "3 contracts in order, each with a budget. Reach the goal to unlock the next. Flights count for the ranking.") + "\n" +
+        Option(FreeMode.On, "FREE MODE (on)", "A sandbox: all contracts open and no budget limit. Flights don't count.");
+
+    static string TutorialHelp() =>
+        Option(SaveData.TutorialOn, "ON", "A guide walks you through your first mission step by step, and explains the mode you chose.") + "\n" +
+        Option(!SaveData.TutorialOn, "OFF", "No guide. The Mission Guide stays in the Esc menu.");
 
     static Button Button(RectTransform parent, string label, System.Action onClick, float height = 50f, int size = 22, bool accent = false, Color? color = null)
     {

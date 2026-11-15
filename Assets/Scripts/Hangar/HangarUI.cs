@@ -71,7 +71,9 @@ public class HangarUI : MonoBehaviour
                 () => d.rocket != null && d.orbit != null, () => ShowTab(2)),
             new TutorialStep("<b>COMMS</b> tab: pick an antenna. It sends your data to Earth: watch the DATA bar and add ground stations if data is lost.",
                 () => d.antenna != null, () => ShowTab(3)),
-            new TutorialStep("Now read <b>ALERTS</b> on the right. An <color=#F0782A>X</color> must be fixed. Reach the science goal, then press <b>LAUNCH</b> to review and fly!"),
+            new TutorialStep(FreeMode.On
+                ? "Free mode: money is not a limit here, so try big designs. An <color=#F0782A>X</color> in <b>ALERTS</b> must still be fixed (mass and power are real limits). Then press <b>LAUNCH</b>!"
+                : "Now read <b>ALERTS</b> on the right. An <color=#F0782A>X</color> must be fixed. Reach the science goal within budget, then press <b>LAUNCH</b> to review and fly!"),
         }, UIFactory.Margin, 500f, () => review != null && review.IsOpen);
     }
 

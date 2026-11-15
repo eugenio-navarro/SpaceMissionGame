@@ -59,6 +59,10 @@ public class HubController : MonoBehaviour
         GameShell.SceneEscape = HandleEscape;
 
         StartTutorial();
+
+        // Si ya hizo el tutorial pero entra por primera vez en Modo Libre, se le explica el modo.
+        if (FreeMode.On && SaveData.Seen("tut_hub") && !SaveData.Seen("tut_free"))
+            GameShell.Tutorial("tut_free", new[] { FreeModeStep() }, 4f, 1000f, () => Busy);
     }
 
     void OnDestroy()
@@ -66,6 +70,12 @@ public class HubController : MonoBehaviour
         if (GameShell.SceneEscape == HandleEscape) GameShell.SceneEscape = null;
         BuildingInteractable.Highlighted = null;
     }
+
+    // Explica de qué se trata el modo en el que está jugando.
+    static TutorialStep FreeModeStep() => FreeMode.On
+        ? new TutorialStep("You are in <b>FREE MODE</b>: a sandbox to experiment. All 3 contracts are open, there is <b>no budget limit</b>, and flights don't count for the campaign or the ranking. Switch to campaign in the main menu.",
+            null, () => SaveData.MarkSeen("tut_free"))
+        : new TutorialStep("You are in <b>CAMPAIGN</b> mode: 3 contracts in order. Reach a contract's science goal within its budget to unlock the next one.");
 
     // Tutorial guiado: cada paso espera a que el jugador haga lo que se pide y resalta el edificio.
     void StartTutorial()
@@ -77,6 +87,7 @@ public class HubController : MonoBehaviour
         GameShell.Tutorial("tut_hub", new[]
         {
             new TutorialStep("Welcome, mission designer! This is your space center. Your job: plan a satellite mission that brings science back to Earth."),
+            FreeModeStep(),
             new TutorialStep("First you need a mission. Click <b>Mission Control</b>: the building that is pulsing.",
                 () => contractsPanel.activeSelf || Accepted(),
                 () => BuildingInteractable.Highlighted = BuildingKind.MissionControl),
@@ -177,42 +188,19 @@ public class HubController : MonoBehaviour
         if (archivePanel != null) archivePanel.gameObject.SetActive(false);
     }
 
-    Button difficultyButton;
-
-    // Botón de nivel de dificultad en Mission Control (se arma la primera vez que se abre el panel).
-    void BuildDifficultyButton()
-    {
-        if (difficultyButton != null) return;
-        difficultyButton = UIFactory.ButtonCard("Difficulty", freeModeButton.transform.parent, "", 22, null, null, false);
-        UIFactory.Pin((RectTransform)difficultyButton.transform, Vector2.one, new Vector2(-92f - 280f - 12f, -20f), new Vector2(340f, 56f));
-        difficultyButton.onClick.AddListener(() =>
-        {
-            Difficulty.Next();
-            RefreshContracts();
-            RefreshStatus();
-        });
-    }
-
     // En Modo Libre se puede aceptar cualquier contrato; en campaña, solo los desbloqueados.
     static bool CanAccept(ContractSpec c) => FreeMode.On || Campaign.IsUnlocked(c);
 
-    public void ToggleFreeMode()
-    {
-        FreeMode.Toggle();
-        RefreshContracts();
-        RefreshStatus();
-    }
+    // El botón quedó en la escena, pero el modo y el nivel solo se cambian en el menú principal.
+    public void ToggleFreeMode() { }
 
     // Estado de cada tarjeta de contrato según la campaña: bloqueado, disponible, aceptado o completado.
     void RefreshContracts()
     {
-        BuildDifficultyButton();
-        difficultyButton.GetComponentInChildren<Text>().text = "LEVEL: " + Difficulty.Name;
-        freeModeButton.GetComponentInChildren<Text>().text = FreeMode.On ? "FREE MODE: ON" : "FREE MODE: OFF";
-        freeModeButton.GetComponent<CardButtonFx>().SetActive(FreeMode.On);
-        freeModeHint.text = FreeMode.On
-            ? "Experiment freely: no budget limit, all contracts open. Results don't count for the campaign."
-            : Difficulty.Summary;
+        // Solo informa el modo y el nivel elegidos en el menú principal
+        freeModeButton.gameObject.SetActive(false);
+        freeModeHint.text = (FreeMode.On ? "FREE MODE" : "CAMPAIGN") + "  ·  LEVEL: " + Difficulty.Name;
+        freeModeHint.color = FreeMode.On ? Palette.Blue : Palette.TextSecondary;
         for (int i = 0; i < contractButtons.Length; i++)
         {
             var c = TestCatalog.Contracts[i];
