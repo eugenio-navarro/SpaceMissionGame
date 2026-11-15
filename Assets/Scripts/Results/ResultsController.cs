@@ -168,14 +168,18 @@ public class ResultsController : MonoBehaviour
 
         whyText.text = run.why;
         tryNextText.text = run.tryNext;
-        similarName.text = run.similarMission;
+        var real = RealMissions.Find(run.similarMission);
+        similarName.text = run.similarMission + (real != null ? "  ·  " + real.agency : "");
+        FitText(similarName, 13);
         similarNote.text = run.similarMissionNote;
+        FitText(similarNote, 11);
         capcomText.text = run.capcomLine;
 
         // Evento de la simulación y dado de riesgo
         eventTitleText.text = run.eventTitle;
         eventTitleText.color = run.eventHurt ? orange : new Color(0.93f, 0.96f, 1f);
         eventBodyText.text = run.eventText;
+        FitText(eventBodyText, 11);
         riskText.text = "Risk roll: " + run.riskPercent + "%  ·  " + (run.riskFailure
             ? "<color=#F0782A>FAILED</color>"
             : "<color=#7BD88F>PASSED</color>");
@@ -183,6 +187,16 @@ public class ResultsController : MonoBehaviour
         // Trade study: el cambio de una sola pieza que habría dado mejor resultado
         var contract = TestCatalog.Contracts.Find(x => x.title == run.contractTitle) ?? TestCatalog.Contracts[0];
         tradeText.text = TradeStudy.Best(run.design ?? ReferenceDesign(), contract);
+    }
+
+    // Achica la letra si el texto no entra en su caja.
+    static void FitText(Text t, int minSize)
+    {
+        t.horizontalOverflow = HorizontalWrapMode.Wrap;
+        t.verticalOverflow = VerticalWrapMode.Truncate;
+        t.resizeTextForBestFit = true;
+        t.resizeTextMinSize = minSize;
+        t.resizeTextMaxSize = t.fontSize;
     }
 
     // Solución de referencia "Tierra" del README (coincide con los valores por defecto de ResultsInfo).

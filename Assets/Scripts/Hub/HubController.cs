@@ -91,7 +91,7 @@ public class HubController : MonoBehaviour
             new TutorialStep("First you need a mission. Click <b>Mission Control</b>: the building that is pulsing.",
                 () => contractsPanel.activeSelf || Accepted(),
                 () => BuildingInteractable.Highlighted = BuildingKind.MissionControl),
-            new TutorialStep("Each contract has a <b>science goal</b> to reach and a <b>budget</b> you can't go over. Press <b>ACCEPT</b> on \"Observe the Earth\".",
+            new TutorialStep("Each contract has a <b>science goal</b> to reach and a <b>budget</b> you can't go over. Press <b>ACCEPT</b> on \"" + TestCatalog.Contracts[0].title + "\".",
                 Accepted,
                 () => BuildingInteractable.Highlighted = Accepted() ? (BuildingKind?)null : BuildingKind.MissionControl),
             new TutorialStep("Contract accepted! Now click the <b>Assembly Hangar</b> (the big pulsing building) to build your satellite.",

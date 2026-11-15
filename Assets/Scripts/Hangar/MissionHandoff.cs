@@ -12,7 +12,7 @@ public static class MissionHandoff
             contractTitle = contract.title,
             objective = contract.objective,
             destination = contract.destination,
-            similarMission = contract.similarMission,
+            similarMission = RealMissions.For(contract, design).name, // radar en la Tierra → SAOCOM (CONAE)
             scienceGoal = contract.scienceGoal,
             budget = contract.budget,
 

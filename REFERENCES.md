@@ -16,9 +16,15 @@ Motor: Unity 6.6 (6000.6.9f1) · URP
 | [x] | Mission Design Lab (NASA Goddard) | Tabla de equipos, trade studies, margen y riesgo | https://etd.gsfc.nasa.gov/capabilities/integrated-design-center/mission-design-lab/ |
 | [x] | Build It Yourself: Satellite! (NASA Webb) | Referencia de juego educativo: opciones bloqueadas, niveles, comparación con misiones reales | https://science.nasa.gov/mission/webb/game-build-it-yourself/ |
 | [x] | CubeSat 101 (NASA CSLI) | Energía, baterías en eclipse y contacto con estaciones terrenas | https://science.nasa.gov/wp-content/uploads/2023/06/nasa_csli_cubesat_101_508.pdf |
-| [x] | Landsat (NASA/USGS) | Misión real del contrato Tierra: desde 1972, ~705 km | https://landsat.gsfc.nasa.gov/ |
-| [x] | Hubble (NASA/ESA) | Misión real del contrato Telescopio: desde 1990, ~540 km | https://science.nasa.gov/mission/hubble/ |
-| [x] | Lunar Reconnaissance Orbiter (NASA) | Misión real del contrato Luna: desde 2009, órbita de ~50 km sobre la Luna | https://science.nasa.gov/mission/lro/ |
+| [x] | Landsat 9 (NASA/USGS) | Contrato "Landsat: Earth Watch" y ficha en Resultados: 2021, 705 km, 16 días, OLI 9 bandas, +700 escenas/día | https://science.nasa.gov/mission/landsat-9 |
+| [x] | Hubble (NASA/ESA) | Contrato "Hubble: Deep Field" y ficha: 1990, 547 km, hasta 5.500 W y ~2.100 W de uso, 6 baterías | https://science.nasa.gov/centers-and-facilities/goddard/a-nasa-refresher-on-hubble-facts-for-the-25th-anniversary |
+| [x] | Lunar Reconnaissance Orbiter (NASA) | Contrato "LRO: Lunar Mapping" y ficha: 2009, ~50 km, ~900 Gb/día, instrumento LAMP | https://science.nasa.gov/mission/lro/spacecraft-and-instruments/ |
+| [x] | SAOCOM 1A y 1B (CONAE, Argentina) | Ficha en Resultados si el satélite de Tierra lleva radar: 2018/2020, ~620 km, radar banda L | https://www.eoportal.org/satellite-missions/saocom |
+| [x] | SAC-D / Aquarius (CONAE + NASA) | Créditos: satélite argentino con el instrumento de NASA que midió la salinidad del mar (2011-2015) | https://www.jpl.nasa.gov/missions/aquarius/ |
+| [x] | Pérdida de Starlink, febrero 2022 (NOAA/CIRES) | Caso real en el evento de tormenta solar: 38 de 49 satélites cayeron por el roce | https://cires.colorado.edu/news/minor-geomagnetic-storm-big-impact-february-2022-starlink-satellite-loss |
+| [x] | Vega y Vega-C (ESA) | "Similar class" de los cohetes mediano y grande: ~1.500 kg a 700 km polar; ~3.300 kg a órbita baja | https://www.esa.int/Enabling_Support/Space_Transportation/Launch_vehicles/Vega-C |
+| [x] | Electron (Rocket Lab) | "Similar class" del cohete chico (unos cientos de kg; no se cita la cifra exacta) | https://rocketlabcorp.com/launch/electron/ |
+| [x] | GOLD Rules, GSFC-STD-1000 (NASA Goddard) | Consejo de CAPCOM sobre márgenes de energía y masa (sin citar porcentajes) | https://standards.nasa.gov/sites/default/files/standards/GSFC/G/0/GSFC-STD-1000Revg_signature.pdf |
 | [ ] | GMAT (NASA) | "Learn more" en créditos (no se usa en el cálculo) | https://software.nasa.gov/software/GSC-19468-1 |
 | [ ] | NASA Mission Viz | "Learn more" en créditos | https://nasa.github.io/mission-viz/ |
 | [ ] | Concept Maturity Levels (JPL) | "Learn more" en créditos | https://dataverse.jpl.nasa.gov/dataset.xhtml?persistentId=hdl:2014/44299 |

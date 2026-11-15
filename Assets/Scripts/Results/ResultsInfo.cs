@@ -15,10 +15,10 @@ public enum ResultKind
 public class ResultsInfo
 {
     // ----- Contrato -----
-    public string contractTitle = "Observe the Earth";
+    public string contractTitle = "Landsat: Earth Watch";
     public string objective = "Track changes in forests and ice.";
     public string destination = "EARTH"; // EARTH, DEEP SPACE o MOON
-    public string similarMission = "Landsat";
+    public string similarMission = "Landsat 9";
     public int scienceGoal = 60;
     public int budget = 300;
 

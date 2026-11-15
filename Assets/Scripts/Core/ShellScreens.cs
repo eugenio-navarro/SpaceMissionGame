@@ -108,7 +108,9 @@ public static class ShellScreens
         Line(nasa, "EQUIPMENT LIST, TRADE STUDIES, MARGINS", "NASA Goddard Mission Design Lab (MDL)");
         Line(nasa, "GAME IDEAS: LEVELS, REAL-MISSION COMPARISON", "NASA Webb, \"Build It Yourself: Satellite!\"");
         Line(nasa, "POWER, BATTERIES, ECLIPSES, GROUND CONTACT", "NASA CubeSat Launch Initiative, \"CubeSat 101\"");
-        Line(nasa, "REAL MISSIONS IN THE GAME", "Landsat (NASA/USGS, since 1972, ~705 km) · Hubble (NASA/ESA, since 1990, ~540 km) · Lunar Reconnaissance Orbiter (NASA, since 2009, ~50 km above the Moon)");
+        Line(nasa, "REAL MISSIONS IN THE GAME", "Landsat 9 (NASA/USGS, 2021, 705 km) · Hubble (NASA/ESA, 1990, 547 km) · Lunar Reconnaissance Orbiter (NASA, 2009, ~50 km above the Moon)");
+        Line(nasa, "ARGENTINA IN SPACE (CONAE)", "SAOCOM 1A & 1B radar satellites (2018, 2020) · SAC-D/Aquarius (2011-2015): an Argentine satellite carrying NASA's instrument that measured ocean salinity");
+        Line(nasa, "REAL CASES AND ROCKETS", "Starlink loss after the Feb 2022 solar storm (NOAA/CIRES) · Rocket classes: Electron, Vega, Vega-C (ESA)");
         Line(nasa, "LEARN MORE", "NASA GMAT (mission analysis) · NASA Mission Viz · JPL Concept Maturity Levels · CSA Digital Games and Activities");
 
         Button(window, "CLOSE", shell.CloseCredits);
@@ -145,7 +147,7 @@ public static class ShellScreens
 
         Line(b, "DATA AND COMMS (GB/day)", "A satellite can only talk to Earth while it flies over a ground station. More stations or a bigger antenna = more data comes home.");
         Line(b, "ORBIT", "The path around Earth or the Moon. Low orbit: sharp detail, short contact. Geostationary: always in contact, far away. Lunar: around the Moon.");
-        Line(b, "MARGIN", "What you have left over. If panels make 250 W and you use 160 W, your margin is 36%. Spare margin protects you from surprises.");
+        Line(b, "MARGIN", "What you have left over. If panels make 250 W and you use 160 W, your margin is 36%. Spare margin protects you from surprises: NASA Goddard's design rules require it.");
         Line(b, "FAILURE RISK", "The chance that something breaks. Thin power or mass margins push it up. If it happens, half the science is lost.");
         Line(b, "BUDGET ($M)", "Every part, rocket and ground station costs money. Going over budget blocks the launch. Cheaper designs score higher.");
 

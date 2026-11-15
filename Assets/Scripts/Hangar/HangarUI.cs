@@ -54,6 +54,10 @@ public class HangarUI : MonoBehaviour
         BuildGuideButton();
 
         StartTutorial();
+        infoText.verticalOverflow = VerticalWrapMode.Truncate;
+        infoText.resizeTextForBestFit = true;
+        infoText.resizeTextMinSize = 14;
+        infoText.resizeTextMaxSize = infoText.fontSize;
     }
 
     // Tutorial guiado: abre cada pestaña y espera a que el jugador elija la pieza que se pide.

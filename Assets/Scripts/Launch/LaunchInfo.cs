@@ -13,7 +13,7 @@ public enum LaunchEventKind
 [Serializable]
 public class LaunchInfo
 {
-    public string missionName = "Observe the Earth";
+    public string missionName = "Landsat: Earth Watch";
     public string rocketId = "mediano"; // chico, mediano o grande (ids del README)
     public string rocketName = "Medium rocket";
     public string orbitId = "leo";

@@ -28,12 +28,12 @@ public static class MissionOutcome
                 r.eventHurt = true;
                 generated = Mathf.Max(0f, generated - r.hungriestInstrumentData);
                 r.eventText = "A burst of particles from the Sun hit the spacecraft. With only " + marginPercent +
-                              "% power margin, the " + r.hungriestInstrument.ToLower() + " had to shut down.";
+                              "% power margin, the " + r.hungriestInstrument.ToLower() + " had to shut down." + StormCase;
             }
             else
             {
                 r.eventText = "A burst of particles from the Sun hit the spacecraft. Your " + marginPercent +
-                              "% power margin kept every instrument on.";
+                              "% power margin kept every instrument on." + StormCase;
             }
         }
         else if (eventKind == LaunchEventKind.StationInterference)
@@ -128,8 +128,16 @@ public static class MissionOutcome
         return "Add an instrument that makes more data, or pick an orbit with more detail.";
     }
 
+    // Caso real (CIRES/NOAA): en febrero de 2022 una tormenta calentó la atmósfera alta y 38 de 49
+    // satélites Starlink recién lanzados cayeron por el roce. El mecanismo del juego es otro (energía).
+    const string StormCase = " Real case: in February 2022 a solar storm made 38 new Starlink satellites fall back to Earth.";
+
     static string Capcom(ResultsInfo r)
     {
+        // P6: regla real de NASA Goddard (GOLD Rules): dejar margen de energía y masa al principio del diseño.
+        float thinnest = Mathf.Min(r.EnergyMargin, r.MassMargin);
+        if (r.result != ResultKind.Success && thinnest >= 0f && thinnest < 0.25f)
+            return "NASA Goddard's design rules ask for spare power and mass early on. Your thinnest margin was " + Mathf.RoundToInt(thinnest * 100f) + "%.";
         if (r.result == ResultKind.Success) return "Nice work. The scientists are already fighting over the data.";
         if (r.result == ResultKind.Partial) return "Not bad. Some data made it home, and now we know what to fix.";
         return "Well... space is hard. Let's look at what happened and try again.";
@@ -137,12 +145,7 @@ public static class MissionOutcome
 
     static string SimilarNote(string mission)
     {
-        switch (mission)
-        {
-            case "Landsat": return "NASA and USGS satellites that have watched Earth's land since 1972.";
-            case "Hubble": return "A space telescope in low Earth orbit, working since 1990.";
-            case "Lunar Reconnaissance Orbiter": return "A NASA orbiter that has mapped the Moon since 2009.";
-            default: return "";
-        }
+        var m = RealMissions.Find(mission);
+        return m != null ? m.fact : "";
     }
 }
