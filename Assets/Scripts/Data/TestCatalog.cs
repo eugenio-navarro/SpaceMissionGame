@@ -23,7 +23,7 @@ public static class TestCatalog
         new PartSpec { id = "panel_l", displayName = "Large solar panel", category = PartCategory.SolarPanel, mass = 40, generation = 250, cost = 20,
             description = "Makes 250 W in sunlight." },
         new PartSpec { id = "bat", displayName = "Battery", category = PartCategory.Battery, mass = 30, cost = 8,
-            description = "Keeps everything running while the satellite is in Earth's shadow." },
+            description = "Keeps everything running during eclipses, when the satellite is in shadow and the panels get no sunlight." },
 
         // Antenas
         new PartSpec { id = "ant_s", displayName = "Small antenna", category = PartCategory.Antenna, mass = 10, power = 15, cost = 5, downlink = 40,
@@ -41,11 +41,11 @@ public static class TestCatalog
 
         // Órbitas
         new PartSpec { id = "leo", displayName = "Low orbit", category = PartCategory.Orbit, contact = 0.5f, capacityMultiplier = 1f, hasShadow = true,
-            lifeYears = 3, altitude = "~500 km", description = "Close to Earth: sharp images, but stations see it only part of the day." },
+            lifeYears = 3, altitude = "~500 km", description = "Close to Earth, like Hubble (~540 km) or Landsat (~705 km): sharp images, but a ground station only hears it during short passes overhead." },
         new PartSpec { id = "geo", displayName = "Geostationary", category = PartCategory.Orbit, contact = 1f, capacityMultiplier = 0.4f, hasShadow = false,
-            lifeYears = 8, altitude = "~36,000 km", description = "Always above the same spot: constant contact, but far away and hard to reach." },
+            lifeYears = 8, altitude = "~36,000 km", description = "Circles once a day, so it stays above the same spot: constant contact, but far away and hard to reach. Eclipses only happen for a few weeks around the equinoxes." },
         new PartSpec { id = "lunar", displayName = "Lunar orbit", category = PartCategory.Orbit, contact = 0.6f, capacityMultiplier = 0.3f, hasShadow = true,
-            lifeYears = 3, altitude = "~384,000 km", description = "Around the Moon. Rockets lift much less this far." },
+            lifeYears = 3, altitude = "~50 km (Moon)", description = "Around the Moon, about 384,000 km from Earth, flying ~50 km above the surface like LRO. Rockets lift much less this far." },
     };
 
     public static readonly List<ContractSpec> Contracts = new List<ContractSpec>

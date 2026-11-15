@@ -16,6 +16,7 @@ public class LaunchInfo
     public string missionName = "Observe the Earth";
     public string rocketId = "mediano"; // chico, mediano o grande (ids del README)
     public string rocketName = "Medium rocket";
+    public string orbitId = "leo";
     public string orbitName = "Low orbit";
     public float orbitAltitudeKm = 500f;
     public string[] stageNames = { "Stage 1 - Booster", "Stage 2 - Upper stage", "Payload - Satellite" };
@@ -30,6 +31,7 @@ public class LaunchInfo
             missionName = run.contractTitle,
             rocketId = run.rocketId,
             rocketName = run.rocketName,
+            orbitId = run.orbitId,
             orbitName = run.orbitName,
             orbitAltitudeKm = AltitudeKm(run.orbitId),
             eventKind = run.eventKind,

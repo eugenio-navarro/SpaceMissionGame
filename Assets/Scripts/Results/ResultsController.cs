@@ -65,6 +65,10 @@ public class ResultsController : MonoBehaviour
     public string testResult = "";
 
     ResultsInfo run;
+
+    // La nave solo se ve apagada y girando sin control si de verdad falló una pieza (dado de riesgo).
+    // Si funciona pero trajo poca ciencia, se ve operativa.
+    bool Broken => run.riskFailure && run.result == ResultKind.Failed;
     float panelShownX;
     bool leaving;
 
@@ -119,7 +123,7 @@ public class ResultsController : MonoBehaviour
         if (atmosphere != null) atmosphere.SetActive(!moon);
 
         // Si la misión falló, el satélite queda apagado: paneles oscuros y menos luz.
-        if (run.result == ResultKind.Failed)
+        if (Broken)
         {
             foreach (Renderer r in panelRenderers)
                 r.material.SetColor("_BaseColor", new Color(0.08f, 0.09f, 0.12f));
@@ -220,7 +224,7 @@ public class ResultsController : MonoBehaviour
         eventCard.alpha = 0f;
         tradeCard.alpha = 0f;
 
-        bool deploy = run.result != ResultKind.Failed;
+        bool deploy = !Broken;
         for (float t = 0f; t < 1.4f; t += Time.deltaTime)
         {
             SetFade(1f - Mathf.Clamp01(t / 0.7f));
@@ -315,7 +319,7 @@ public class ResultsController : MonoBehaviour
         if (satellite == null || run == null) return;
 
         // Si falló, el satélite gira sin control; si no, rota apenas.
-        if (run.result == ResultKind.Failed)
+        if (Broken)
             satellite.Rotate(new Vector3(18f, 26f, 11f) * Time.deltaTime, Space.World);
         else
             satellite.Rotate(Vector3.up, 4f * Time.deltaTime, Space.World);

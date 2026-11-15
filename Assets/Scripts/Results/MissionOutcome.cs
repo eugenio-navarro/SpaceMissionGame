@@ -82,7 +82,8 @@ public static class MissionOutcome
     {
         if (r.result == ResultKind.Success) return "The science goal was reached.";
         if (r.result == ResultKind.Partial) return "Some science came back, but not enough.";
-        return "Too little science reached Earth.";
+        if (r.riskFailure) return "A part failed on the way up, and too little science reached Earth.";
+        return "The spacecraft works, but too little science reached Earth.";
     }
 
     static string Why(ResultsInfo r, float generated, float downlink, bool dataJam)
@@ -118,6 +119,8 @@ public static class MissionOutcome
             return "Keep at least 20% power margin: a bigger solar panel or a lighter instrument.";
         if (r.eventHurt && r.eventKind == LaunchEventKind.StationInterference)
             return "Use 3 or more ground stations, so the others cover when one fails.";
+        if (dataJam && r.design != null)
+            return MissionCalculator.DataFix(r.design) + " That way more data comes down.";
         if (dataJam)
             return "Add a ground station or a bigger antenna so more data comes down.";
         if (r.result == ResultKind.Success)

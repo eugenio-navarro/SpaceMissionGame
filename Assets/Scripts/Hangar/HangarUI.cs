@@ -46,7 +46,7 @@ public class HangarUI : MonoBehaviour
             clearButton.onClick.AddListener(Clear);
         }
 
-        infoText.text = "Pick parts in each tab. Watch the bars on the right: if something doesn't fit, LAUNCH stays locked.";
+        infoText.text = "Pick parts in each tab. Watch the bars on the right: if something doesn't fit, LAUNCH stays locked. Numbers are simplified game values.";
         ShowTab(0);
         Refresh();
 
@@ -121,8 +121,10 @@ public class HangarUI : MonoBehaviour
 
         scienceText.text = $"{r.science}<color={Secondary}>/{c.scienceGoal}</color>";
         scienceText.color = r.science >= c.scienceGoal ? Palette.Green : Palette.Orange;
-        riskText.text = $"{r.riskPercent}%";
-        riskText.color = r.riskPercent <= 10 ? Palette.Green : Palette.Orange;
+        // El riesgo depende de los márgenes de energía y masa: sin panel o sin cohete todavía no se puede calcular.
+        bool riskKnown = r.generation > 0f && r.capacity > 0f;
+        riskText.text = riskKnown ? $"{r.riskPercent}%" : "--";
+        riskText.color = !riskKnown ? Palette.Dim : r.riskPercent <= 10 ? Palette.Green : Palette.Orange;
 
         var alerts = new StringBuilder();
         foreach (var b in r.blockers) alerts.AppendLine($"<color={Orange}>X</color>  {b}");

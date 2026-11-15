@@ -79,11 +79,11 @@ public static class MissionCalculator
 
     static void AddBlockers(MissionDesign d, ContractSpec c, MissionReport r, bool freeMode)
     {
-        if (d.instruments.Count == 0) r.blockers.Add("Add at least one instrument (Instruments tab).");
+        if (d.instruments.Count == 0) r.blockers.Add("Add at least one instrument (Science tab).");
         if (d.panel == null) r.blockers.Add("Add a solar panel (Power tab).");
         if (d.antenna == null) r.blockers.Add("Add an antenna (Comms tab).");
-        if (d.rocket == null) r.blockers.Add("Choose a rocket (Rocket/Orbit tab).");
-        if (d.orbit == null) r.blockers.Add("Choose an orbit (Rocket/Orbit tab).");
+        if (d.rocket == null) r.blockers.Add("Choose a rocket (Rocket tab).");
+        if (d.orbit == null) r.blockers.Add("Choose an orbit (Rocket tab).");
         else if (!c.AllowsOrbit(d.orbit.id)) r.blockers.Add($"This contract doesn't allow {d.orbit.displayName.ToLower()}.");
 
         foreach (var i in d.instruments)
@@ -100,17 +100,36 @@ public static class MissionCalculator
             r.blockers.Add($"Over budget: ${r.cost}M of ${c.budget}M.");
     }
 
+    // Solo sugiere arreglos que todavía se pueden hacer con este diseño.
+    public static string DataFix(MissionDesign d)
+    {
+        bool moreStations = d.stations < MaxStations;
+        bool biggerAntenna = d.antenna != null && d.antenna.downlink < BiggestDownlink();
+        if (moreStations && biggerAntenna) return "Add ground stations or a bigger antenna.";
+        if (moreStations) return "Add ground stations.";
+        if (biggerAntenna) return "Use a bigger antenna.";
+        return "Use instruments that make less data.";
+    }
+
+    static float BiggestDownlink()
+    {
+        float best = 0f;
+        foreach (var p in TestCatalog.ByCategory(PartCategory.Antenna)) best = Mathf.Max(best, p.downlink);
+        return best;
+    }
+
     static void AddWarnings(MissionDesign d, ContractSpec c, MissionReport r)
     {
         if (d.orbit != null && d.orbit.hasShadow && d.panel != null && d.battery == null)
-            r.warnings.Add("No battery: in Earth's shadow the panels only give 65% power.");
+            r.warnings.Add("No battery: in shadow (eclipse) the panels make no power, so on average you only get 65%.");
 
         if (d.antenna != null && d.orbit != null && r.dataGenerated > r.downlink)
             r.warnings.Add($"Data jam: you make {r.dataGenerated:0} GB/day, but only {r.downlink:0} reach Earth. " +
-                           "Add ground stations or a bigger antenna.");
+                           DataFix(d));
 
-        if (r.energyMargin >= 0f && r.energyMargin < 0.10f)
-            r.warnings.Add("Power margin under 10%: a solar storm could switch off an instrument.");
+        // Mismo umbral que el evento de tormenta solar (MissionOutcome): con menos, apaga un instrumento.
+        if (r.energyMargin >= 0f && r.energyMargin < MissionOutcome.StormSafeMargin)
+            r.warnings.Add($"Power margin under {MissionOutcome.StormSafeMargin * 100f:0}%: a solar storm could switch off an instrument.");
 
         if (r.massMargin >= 0f && r.massMargin < 0.10f)
             r.warnings.Add("Mass margin under 10%: a risky launch.");

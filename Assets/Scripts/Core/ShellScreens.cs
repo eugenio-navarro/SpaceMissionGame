@@ -82,17 +82,41 @@ public static class ShellScreens
     public static void BuildCredits(GameShell shell, RectTransform layer)
     {
         var dim = Dim(layer);
-        var window = Window(dim, "CREDITS", GameTitle, 820f, Palette.Blue);
+        var window = Window(dim, "CREDITS", GameTitle, 1560f, Palette.Blue);
 
-        Line(window, "MADE FOR", "NASA Space Apps Challenge 2026 · Buenos Aires · 48 hours");
-        Line(window, "TEAM", "A team of 2 from Buenos Aires");
-        Line(window, "BASED ON", "NASA Mission Design Lab (Goddard) · Landsat, Hubble, LRO");
-        Line(window, "3D MODELS AND PARTICLES", "Kenney: Space Kit, City Kit Industrial, Particle Pack (CC0)");
-        Line(window, "PLANET TEXTURES", "Solar System Scope (CC BY 4.0)");
-        Line(window, "FONTS", "Chakra Petch and Share Tech Mono (SIL Open Font License)");
-        Line(window, "MUSIC AND SOUNDS", "Made in code for this game · Engine: Unity 6.6");
+        // Dos columnas: el juego a la izquierda, las fuentes de NASA a la derecha
+        var row = UIFactory.Rect("Columns", window);
+        var h = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+        h.spacing = 48f;
+        h.childControlWidth = h.childControlHeight = true;
+        h.childForceExpandWidth = true;
+        h.childForceExpandHeight = false;
+        var game = Column(row);
+        var nasa = Column(row);
+
+        Line(game, "MADE FOR", "NASA Space Apps Challenge 2026: \"Space Mission Design Game\" · Buenos Aires local event");
+        Line(game, "TEAM", "Hell0 World! · a team of 2 from Buenos Aires");
+        Line(game, "3D MODELS AND PARTICLES", "Kenney: Space Kit, City Kit Industrial, Particle Pack (CC0)");
+        Line(game, "PLANET AND STAR TEXTURES", "Solar System Scope (CC BY 4.0)");
+        Line(game, "FONTS", "Chakra Petch and Share Tech Mono (SIL Open Font License)");
+        Line(game, "MUSIC AND SOUNDS", "Made in code for this game · Engine: Unity 6.6");
+        Line(game, "ABOUT THE NUMBERS", "Masses, costs, power and data rates are simplified game values, chosen to teach the trade-offs, not real specs.");
+
+        Line(nasa, "MISSION SEGMENTS", "NASA, \"Design and Develop Science Missions\": launch, space, ground and user segments");
+        Line(nasa, "EQUIPMENT LIST, TRADE STUDIES, MARGINS", "NASA Goddard Mission Design Lab (MDL)");
+        Line(nasa, "GAME IDEAS: LEVELS, REAL-MISSION COMPARISON", "NASA Webb, \"Build It Yourself: Satellite!\"");
+        Line(nasa, "POWER, BATTERIES, ECLIPSES, GROUND CONTACT", "NASA CubeSat Launch Initiative, \"CubeSat 101\"");
+        Line(nasa, "REAL MISSIONS IN THE GAME", "Landsat (NASA/USGS, since 1972, ~705 km) · Hubble (NASA/ESA, since 1990, ~540 km) · Lunar Reconnaissance Orbiter (NASA, since 2009, ~50 km above the Moon)");
+        Line(nasa, "LEARN MORE", "NASA GMAT (mission analysis) · NASA Mission Viz · JPL Concept Maturity Levels · CSA Digital Games and Activities");
 
         Button(window, "CLOSE", shell.CloseCredits);
+    }
+
+    static RectTransform Column(RectTransform parent)
+    {
+        var col = UIFactory.Rect("Column", parent);
+        UIFactory.Vertical(col.gameObject, 0, 0, 0, 0, 12f);
+        return col;
     }
 
     // ---------- Aviso ----------
@@ -111,7 +135,7 @@ public static class ShellScreens
         UIFactory.Vertical(box.gameObject, 4, 4, 0, 0, 2f);
         var c = UIFactory.Caption("Caption", box, caption);
         UIFactory.Layout(c.gameObject, 22f);
-        UIFactory.Label("Text", box, text, 24, Palette.TextMain, FontKind.Body); // alto según las líneas que ocupe
+        UIFactory.Label("Text", box, text, 21, Palette.TextMain, FontKind.Body); // alto según las líneas que ocupe
     }
 
     // ---------- Título ----------

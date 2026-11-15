@@ -128,7 +128,7 @@ public class MissionReview : MonoBehaviour
         UIFactory.Place(caption.rectTransform, new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -56f), new Vector2(-100f, -28f));
         var title = UIFactory.Label("Title", window, "Master Equipment List (MEL)", 40, Palette.TextMain, FontKind.Title);
         UIFactory.Place(title.rectTransform, new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -108f), new Vector2(-100f, -54f));
-        var why = UIFactory.Label("Why", window, "NASA engineers check this list before every launch: each part with its mass, power and cost.", 20, Palette.TextSecondary);
+        var why = UIFactory.Label("Why", window, "NASA's Mission Design Lab builds this list for every mission concept: each part with its mass, power and cost. Game values are simplified.", 20, Palette.TextSecondary);
         UIFactory.Place(why.rectTransform, new Vector2(0f, 1f), Vector2.one, new Vector2(40f, -146f), new Vector2(-100f, -110f));
 
         var close = UIFactory.ButtonCard("Close", window, "X", 26, null, null, false);

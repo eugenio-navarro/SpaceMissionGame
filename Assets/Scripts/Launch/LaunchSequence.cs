@@ -75,6 +75,7 @@ public class LaunchSequence : MonoBehaviour
         PickRocket(info.rocketId);
         rocketStart = rocket.position;
         hud.Setup(info);
+        if (info.orbitId == "lunar") LabelLunarTrip();
         hud.SetClock(-countdownSeconds);
         if (hud.skipButton != null) hud.skipButton.onClick.AddListener(Skip);
         challenge = SeparationChallenge.Create(hud.fade.canvas.rootCanvas.transform, RequestSeparation);
@@ -85,6 +86,15 @@ public class LaunchSequence : MonoBehaviour
 
         launchCamera.offset = camPad;
         StartCoroutine(Run());
+    }
+
+    // Hacia la Luna el número que sube no es la altura de la órbita (unos 50 km sobre la Luna)
+    // sino la distancia recorrida desde la Tierra: se rotula así para no enseñar un dato falso.
+    void LabelLunarTrip()
+    {
+        hud.orbitLabel.text = "MOON 384,000 km";
+        foreach (var t in hud.GetComponentsInChildren<UnityEngine.UI.Text>(true))
+            if (t.text == "ALTITUDE") t.text = "DISTANCE FROM EARTH";
     }
 
     // Deja activa solo la variante pedida y ajusta la cámara a su tamaño.
@@ -178,7 +188,7 @@ public class LaunchSequence : MonoBehaviour
             if (world != null && world.activeSelf && p > 0.6f) world.SetActive(false); // ya no se ve el suelo
             launchCamera.shake = Mathf.Lerp(0.12f, 0f, p * 2f);
 
-            if (t < 2.5f) hud.SetStatus("Liftoff!");
+            if (t < 4f) hud.SetStatus("Liftoff! Time is sped up: the real climb to orbit takes ~10 min");
             else if (separated) hud.SetStatus(t < separatedAt + 2.5f ? separationMessage : "Leaving the atmosphere");
             else if (t < stage1Seconds - 2f) hud.SetStatus("Max Q: the air pushes hardest on the rocket");
             else if (t < stage1Seconds) hud.SetStatus("Stage 1 is almost out of fuel");
@@ -234,7 +244,9 @@ public class LaunchSequence : MonoBehaviour
         if (world != null) world.SetActive(false);
         hud.SetAltitude(info.orbitAltitudeKm * 1000f);
         hud.SetActiveStage(2);
-        hud.SetStatus("Orbit reached: " + info.orbitName + ", " + info.orbitAltitudeKm.ToString("0") + " km");
+        hud.SetStatus(info.orbitId == "lunar"
+            ? "Arrived at the Moon, 384,000 km away. Orbiting ~50 km above it"
+            : "Orbit reached: " + info.orbitName + ", " + info.orbitAltitudeKm.ToString("#,0", System.Globalization.CultureInfo.InvariantCulture) + " km up");
         launchCamera.offset = camOrbit;
         launchCamera.shake = 0f;
 

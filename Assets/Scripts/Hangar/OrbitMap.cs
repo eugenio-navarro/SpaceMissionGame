@@ -33,10 +33,10 @@ public class OrbitMap : MonoBehaviour
 
         Disc(root, earthCenter, 52f, Palette.Planet, "EARTH");
         Disc(root, moonCenter, 22f, Palette.Metal, "");
-        Label(root, moonCenter + new Vector2(0f, -70f), "MOON", Palette.TextSecondary);
+        Label(root, moonCenter + new Vector2(0f, -70f), "MOON\n384,000 km away", Palette.TextSecondary);
         Label(root, earthCenter + new Vector2(0f, RadiusFor("leo") + 12f), "LOW ~500 km", id == "leo" ? Palette.Orange : Palette.Dim);
         Label(root, earthCenter + new Vector2(0f, RadiusFor("geo") + 12f), "GEOSTATIONARY ~36,000 km", id == "geo" ? Palette.Orange : Palette.Dim);
-        Label(root, moonCenter + new Vector2(0f, RadiusFor("lunar") + 12f), "LUNAR\n~384,000 km", id == "lunar" ? Palette.Orange : Palette.Dim);
+        Label(root, moonCenter + new Vector2(0f, RadiusFor("lunar") + 12f), "LUNAR ORBIT\n~50 km up", id == "lunar" ? Palette.Orange : Palette.Dim);
 
         if (chosen == null) return;
         center = id == "lunar" ? moonCenter : earthCenter;
