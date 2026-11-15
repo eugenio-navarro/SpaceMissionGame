@@ -35,7 +35,6 @@ public class ContractSpec
     public string objective;
     public string destination;
     public string similarMission;
-    public string similarMissionInfo;
     public int scienceGoal;
     public int budget;
     public bool unlocked;
