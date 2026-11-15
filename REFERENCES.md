@@ -90,3 +90,7 @@ Generados por código en el juego (`Assets/Scripts/Core/SoundBank.cs`): no se us
 
 - Textures by **Solar System Scope** — https://www.solarsystemscope.com/textures/ — licensed under CC BY 4.0.
 - 3D assets by **Kenney** (www.kenney.nl) — CC0.
+
+## Publication and delivery assistance
+
+- **ChatGPT (OpenAI):** itch.io publication configuration, responsive WebGL HTML/CSS wrapper, repository documentation, submission text. The official project demonstration is the team-supplied MissionControl_Demo.mp4 (29.4 seconds, 1920 x 1080), copied unchanged. ChatGPT did not generate or edit this video. Its language and content credits require team review before submission.

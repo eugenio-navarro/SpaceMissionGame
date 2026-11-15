@@ -170,3 +170,7 @@ Packages/packages-lock.json linguist-generated
 
 # Exceptions for .asset files such as lightning pre-baking
 LightingData.asset     binary
+
+# Small public documentation assets should render directly on GitHub.
+docs/images/*.png              -filter -diff -merge -text
+docs/submission/*.mp4          -filter -diff -merge -text

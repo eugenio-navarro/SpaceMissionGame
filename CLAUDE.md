@@ -1,11 +1,15 @@
-# CLAUDE.md
+# Project instructions
 
-La fuente de verdad del proyecto es **`README.md`** (en especial la sección 12, "Contexto para asistentes de IA"). Leelo primero.
+Read README.md for the current game behavior, controls, execution and publication workflow. REFERENCES.md lists sources, credits and AI use. docs/submission/SUBMISSION.md contains prepared delivery materials.
 
-## Filosofía del proyecto
+The original planning document is preserved in docs/PROJECT_CONTEXT.md as historical context. Its planned architecture and checklists are not proof of implementation. Verify behavior in current source before documenting it.
 
-Es un hackathon de 48 h, así que la filosofía global se ajusta así:
-
-- **Sin TDD, sin ADRs y sin proponer alternativas** para cada decisión. Se hace lo simple que funcione.
-- Lo chico se decide y se avisa en una línea. Lo que toca trabajo del otro integrante se consulta antes.
-- Sigue valiendo el reparto de escenas y dueños de la sección 9 del README.
+- Unity 6000.6.9f1, URP, WebGL. Use the Input System and InputSystemUIInputModule.
+- Keep game text and public submission materials in English.
+- Explain why designs fail and what players can change.
+- Current catalog: Assets/Scripts/Data/TestCatalog.cs. Rules: MissionCalculator.cs and MissionOutcome.cs. Do not describe ScriptableObjects or MissionState as implemented without checking source.
+- Browser saves use PlayerPrefs. No threads or file-based browser saves.
+- Preserve docs/web-player/ when rebuilding WebGL.
+- Coordinate before editing another teammate's scenes. Historical ownership is in section 9 of docs/PROJECT_CONTEXT.md.
+- Prefer simple hackathon changes. No mandatory TDD or ADRs. Record new external resources in REFERENCES.md.
+- Keep commits clear. Do not mark an external submission complete without observing confirmation.
