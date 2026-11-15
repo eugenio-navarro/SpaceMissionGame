@@ -10,7 +10,7 @@ A free 3D browser game by **Hell0 World!**, created for **NASA Space Apps Challe
 
 Use a desktop browser with a mouse and keyboard. Click **Run game**, wait for the game to load, and use fullscreen for a larger view. The game interface is in English.
 
-[Watch the demo](https://github.com/eugenio-navarro/SpaceMissionGame/raw/refs/heads/main/docs/submission/MissionControl_Demo.mp4)
+[Watch the demo](https://drive.google.com/file/d/1_I8YO11FsorvBs6qYRLHKcC8quKHXhgw/view)
 
 ![Mission Control main menu](docs/images/cover_menu.png)
 
