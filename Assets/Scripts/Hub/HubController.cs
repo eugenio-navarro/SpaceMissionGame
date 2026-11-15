@@ -1,13 +1,17 @@
+using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // Menú principal en 3D: clics en edificios, panel de contratos, carteles y tooltip.
 public class HubController : MonoBehaviour
 {
-    // TEMPORAL hasta que exista MissionState: contrato aceptado, sobrevive al cambio de escena.
-    public static string AcceptedContractId;
+    // TEMPORAL hasta que exista MissionState: el contrato aceptado queda guardado (sobrevive al cerrar el juego).
+    public static string AcceptedContractId
+    {
+        get => SaveData.AcceptedContract;
+        set => SaveData.AcceptedContract = value;
+    }
 
     public string hangarScene = "Hangar";
 
@@ -22,28 +26,66 @@ public class HubController : MonoBehaviour
     public Text contractDetail;
     public GameObject toast;
     public Text toastText;
+    public Button menuButton;
 
     float toastUntil;
     CanvasGroup toastGroup;
+    Canvas canvas;
+    bool titleOpen;
 
     bool AnyPanelOpen => contractsPanel.activeSelf || infoPanel.activeSelf;
 
+    // Mientras hay un panel, el título o la pausa, los edificios no responden.
+    public bool Busy => AnyPanelOpen || titleOpen || (GameShell.Instance != null && GameShell.Instance.MenuOpen);
+
     void Start()
     {
+        canvas = tooltip.GetComponentInParent<Canvas>().rootCanvas;
         toastGroup = toast.GetComponent<CanvasGroup>();
         toast.SetActive(false);
         CloseAll();
         HideTooltip();
         RefreshStatus();
+        if (menuButton != null && GameShell.Instance != null) menuButton.onClick.AddListener(GameShell.Instance.OpenMenu);
+        GameShell.SceneEscape = HandleEscape;
+
+        // La primera vez de la sesión se ve el título encima del centro espacial.
+        titleOpen = GameShell.ShowTitleOnce(Enter);
+        if (titleOpen) canvas.enabled = false;
+        else Enter();
+    }
+
+    void OnDestroy()
+    {
+        if (GameShell.SceneEscape == HandleEscape) GameShell.SceneEscape = null;
+    }
+
+    void Enter()
+    {
+        titleOpen = false;
+        canvas.enabled = true;
+        RefreshStatus();
+        GameShell.Tutorial("tut_hub", new[]
+        {
+            "Welcome, mission designer! Your job: plan a satellite mission that brings science back to Earth.",
+            "Click <b>Mission Control</b> to pick a contract. Each one has a science goal and a budget.",
+            "Then click the <b>Assembly Hangar</b> to build your satellite and launch it.",
+        }, UIFactory.Margin + 172f, 720f, () => Busy);
+    }
+
+    // Esc cierra el panel abierto; si no hay ninguno, deja que se abra la pausa.
+    bool HandleEscape()
+    {
+        if (!AnyPanelOpen) return false;
+        CloseAll();
+        GameShell.Play(Sfx.Click);
+        return true;
     }
 
     void Update()
     {
         if (tooltip.gameObject.activeSelf && Mouse.current != null)
-        {
-            var canvas = tooltip.GetComponentInParent<Canvas>();
             tooltip.position = Mouse.current.position.ReadValue() + new Vector2(20f, -20f) * canvas.scaleFactor;
-        }
 
         if (toast.activeSelf && Time.unscaledTime > toastUntil)
         {
@@ -54,7 +96,7 @@ public class HubController : MonoBehaviour
 
     public void ShowTooltip(string text)
     {
-        if (AnyPanelOpen) return;
+        if (Busy) return;
         tooltipText.text = text;
         tooltip.gameObject.SetActive(true);
     }
@@ -63,7 +105,7 @@ public class HubController : MonoBehaviour
 
     public void OnBuildingClicked(BuildingKind kind)
     {
-        if (AnyPanelOpen) return;
+        if (Busy) return;
         switch (kind)
         {
             case BuildingKind.MissionControl:
@@ -71,8 +113,12 @@ public class HubController : MonoBehaviour
                 contractsPanel.SetActive(true);
                 break;
             case BuildingKind.Hangar:
-                if (string.IsNullOrEmpty(AcceptedContractId)) Toast("First pick a contract at Mission Control.");
-                else SceneManager.LoadScene(hangarScene);
+                if (string.IsNullOrEmpty(AcceptedContractId))
+                {
+                    GameShell.Play(Sfx.Deny);
+                    Toast("First pick a contract at Mission Control.");
+                }
+                else GameShell.Load(hangarScene);
                 break;
             case BuildingKind.Antennas:
                 ShowInfo("Ground Stations",
@@ -80,10 +126,29 @@ public class HubController : MonoBehaviour
                     "Coming soon. For now, pick them in the Hangar (Comms tab).");
                 break;
             case BuildingKind.Dome:
-                ShowInfo("Mission Archive",
-                    "Your past missions, results and unlocked parts will live here.\n\nComing soon.");
+                ShowInfo("Mission Archive", ArchiveText());
                 break;
         }
+    }
+
+    // Mejores resultados guardados de cada contrato.
+    static string ArchiveText()
+    {
+        int flown = SaveData.MissionsFlown;
+        if (flown == 0) return "No missions flown yet.\n\nLaunch your first satellite and its result will be saved here.";
+
+        var sb = new StringBuilder();
+        sb.AppendLine($"Missions flown: <color={Palette.Tag(Palette.TextMain)}>{flown}</color>\n");
+        foreach (var c in TestCatalog.Contracts)
+        {
+            int rank = SaveData.BestRank(c.title);
+            if (rank == 0) continue;
+            string label = rank == 3 ? $"<color={Palette.Tag(Palette.Green)}>SUCCESS</color>"
+                : rank == 2 ? $"<color={Palette.Tag(Palette.Orange)}>PARTIAL</color>"
+                : $"<color={Palette.Tag(Palette.Orange)}>FAILED</color>";
+            sb.AppendLine($"<color={Palette.Tag(Palette.TextMain)}>{c.title}</color>   best: {label}   science {SaveData.BestScience(c.title)}/{c.scienceGoal}");
+        }
+        return sb.ToString();
     }
 
     public void AcceptContract(int index)
@@ -93,6 +158,7 @@ public class HubController : MonoBehaviour
         AcceptedContractId = contract.id;
         CloseAll();
         RefreshStatus();
+        GameShell.Play(Sfx.Accept);
         Toast($"Contract accepted: {contract.title}. Now head to the Assembly Hangar!");
     }
 
@@ -111,14 +177,14 @@ public class HubController : MonoBehaviour
 
     void RefreshStatus()
     {
-        if (string.IsNullOrEmpty(AcceptedContractId))
+        var c = string.IsNullOrEmpty(AcceptedContractId) ? null : TestCatalog.Contract(AcceptedContractId);
+        if (c == null)
         {
             contractTitle.text = "None yet";
             contractTitle.color = Palette.Dim;
             contractDetail.text = "Visit Mission Control to pick one";
             return;
         }
-        var c = TestCatalog.Contract(AcceptedContractId);
         contractTitle.text = c.title;
         contractTitle.color = Palette.TextMain;
         contractDetail.text = $"Goal {c.scienceGoal} science  ·  Budget ${c.budget}M";

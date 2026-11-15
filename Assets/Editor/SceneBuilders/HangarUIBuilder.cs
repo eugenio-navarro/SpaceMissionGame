@@ -44,8 +44,12 @@ public static class HangarUIBuilder
         ui.backButton = UIFactory.ButtonCard("BackButton", root, "<  SPACE CENTER", 26);
         UIFactory.Pin((RectTransform)ui.backButton.transform, Vector2.one, new Vector2(-M, -M), new Vector2(RightWidth, 64f));
 
-        var hint = UIFactory.Label("Hint", root, "DRAG TO ROTATE  ·  SCROLL TO ZOOM", 15, Palette.TextSecondary, FontKind.Body, TextAnchor.MiddleCenter);
-        UIFactory.Pin(hint.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -M), new Vector2(600f, 30f));
+        var hint = UIFactory.Label("Hint", root, "DRAG TO ROTATE  ·  SCROLL TO ZOOM  ·  ESC: MENU", 15, Palette.TextSecondary, FontKind.Body, TextAnchor.MiddleCenter);
+        UIFactory.Pin(hint.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -M), new Vector2(470f, 30f));
+        hint.resizeTextForBestFit = true; // en 4:3 queda menos espacio entre las columnas
+        hint.resizeTextMinSize = 11;
+        hint.resizeTextMaxSize = 15;
+        hint.verticalOverflow = VerticalWrapMode.Truncate;
     }
 
     static void BuildCatalog(Transform root, HangarUI ui)
@@ -85,7 +89,11 @@ public static class HangarUIBuilder
         UIFactory.Pin(card, Vector2.zero, new Vector2(M, M), new Vector2(LeftWidth, 150f));
         Caption(card, "Funds left");
         ui.fundsText = UIFactory.Label("Value", card, "", 64, Palette.Green, FontKind.Mono);
-        UIFactory.Place(ui.fundsText.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 10f), new Vector2(-20f, -44f));
+        UIFactory.Place(ui.fundsText.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 10f), new Vector2(-180f, -44f));
+
+        // Vaciar el diseño (pide confirmar con un segundo clic)
+        ui.clearButton = UIFactory.ButtonCard("ClearButton", card, "CLEAR ALL", 22, null, null, false);
+        UIFactory.Pin((RectTransform)ui.clearButton.transform, new Vector2(1f, 0f), new Vector2(-20f, 22f), new Vector2(150f, 56f));
         UIFactory.Appear(card.gameObject, 0.12f);
     }
 

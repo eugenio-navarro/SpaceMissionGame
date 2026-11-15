@@ -21,13 +21,17 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (hub != null && hub.Busy) return;
         transform.localScale = baseScale * hoverScale;
+        GameShell.SetPointer(true);
+        GameShell.Play(Sfx.Hover);
         if (hub != null) hub.ShowTooltip(displayName);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         transform.localScale = baseScale;
+        GameShell.SetPointer(false);
         if (hub != null) hub.HideTooltip();
     }
 
@@ -35,7 +39,9 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         if (eventData.button != PointerEventData.InputButton.Left) return;
         transform.localScale = baseScale;
-        if (hub == null) return;
+        GameShell.SetPointer(false);
+        if (hub == null || hub.Busy) return;
+        GameShell.Play(Sfx.Click);
         hub.HideTooltip();
         hub.OnBuildingClicked(kind);
     }

@@ -17,9 +17,11 @@ public class HangarUI : MonoBehaviour
     public Text contractTitle, contractDetail;
     public ResourceBar massBar, powerBar, dataBar, costBar;
     public Text scienceText, riskText, alertsText, fundsText, launchReasonText;
-    public Button launchButton, backButton;
+    public Button launchButton, backButton, clearButton;
 
     int currentTab;
+    float clearArmedUntil;
+    Text clearLabel;
     static string Orange => Palette.Tag(Palette.Orange);
     static string Green => Palette.Tag(Palette.Green);
     static string Secondary => Palette.Tag(Palette.TextSecondary);
@@ -34,10 +36,46 @@ public class HangarUI : MonoBehaviour
         launchButton.onClick.AddListener(controller.Launch);
         backButton.onClick.AddListener(controller.BackToHub);
         controller.Changed += Refresh;
+        if (clearButton != null)
+        {
+            clearLabel = clearButton.GetComponentInChildren<Text>();
+            clearButton.onClick.AddListener(Clear);
+        }
 
         infoText.text = "Pick parts in each tab. Watch the bars on the right: if something doesn't fit, LAUNCH stays locked.";
         ShowTab(0);
         Refresh();
+
+        GameShell.Tutorial("tut_hangar", new[]
+        {
+            "Build your satellite with the four tabs on the left: <b>Science</b>, <b>Power</b>, <b>Rocket</b> and <b>Comms</b>.",
+            "The bars on the right compare what you use against what you have. <color=#7BD88F>Green</color> is fine, <color=#F0782A>orange</color> means trouble.",
+            "Reach the science goal without going over budget. When there are no red X alerts, press <b>LAUNCH</b>!",
+        }, UIFactory.Margin, 500f);
+    }
+
+    // Primer clic: pide confirmar. Segundo clic (dentro de 3 s): vacía el diseño.
+    void Clear()
+    {
+        if (Time.unscaledTime > clearArmedUntil)
+        {
+            clearArmedUntil = Time.unscaledTime + 3f;
+            clearLabel.text = "SURE?";
+            return;
+        }
+        clearArmedUntil = 0f;
+        controller.ClearDesign();
+        infoText.text = "Design cleared. Start again from the Science tab.";
+        ShowTab(0);
+    }
+
+    void Update()
+    {
+        if (clearLabel != null && clearArmedUntil > 0f && Time.unscaledTime > clearArmedUntil)
+        {
+            clearArmedUntil = 0f;
+            clearLabel.text = "CLEAR ALL";
+        }
     }
 
     void OnDestroy()

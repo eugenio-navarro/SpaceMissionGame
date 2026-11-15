@@ -109,8 +109,10 @@ public class LaunchSequence : MonoBehaviour
 
     void Update()
     {
+        // Esc abre la pausa (GameShell); Espacio saltea el lanzamiento.
+        if (GameShell.Instance != null && GameShell.Instance.MenuOpen) return;
         Keyboard kb = Keyboard.current;
-        if (kb != null && (kb.spaceKey.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame)) Skip();
+        if (kb != null && kb.spaceKey.wasPressedThisFrame) Skip();
     }
 
     public void Skip()
@@ -134,6 +136,7 @@ public class LaunchSequence : MonoBehaviour
                 stage1Flame.Play();
                 stage1Smoke.Play();
                 padSmoke.Play();
+                GameShell.PlayLoop(Sfx.Rumble);
                 launchCamera.shake = 0.05f;
                 hud.SetStatus("Ignition!");
             }
@@ -193,6 +196,8 @@ public class LaunchSequence : MonoBehaviour
 
         // 3. Llegada a órbita
         stage2Flame.Stop();
+        GameShell.StopLoop();
+        GameShell.Play(Sfx.Accept);
         if (stage1 != null) stage1.gameObject.SetActive(false);
         SetSky(1f);
         if (world != null) world.SetActive(false);
@@ -211,6 +216,7 @@ public class LaunchSequence : MonoBehaviour
         }
 
         // 4. Evento
+        GameShell.Play(ResultsContext.GetOrCreate().eventHurt ? Sfx.Deny : Sfx.Click);
         hud.ShowEvent(info.eventTitle, info.eventText, !ResultsContext.GetOrCreate().eventHurt);
         for (float t = 0f; t < eventSeconds; t += Time.deltaTime)
         {
@@ -225,6 +231,8 @@ public class LaunchSequence : MonoBehaviour
     IEnumerator Leave()
     {
         leaving = true;
+        GameShell.StopLoop();
+        GameShell.Play(Sfx.Whoosh);
         LaunchContext.LaunchFinished = true;
         for (float t = 0f; t < fadeSeconds; t += Time.deltaTime)
         {

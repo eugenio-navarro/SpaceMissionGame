@@ -20,6 +20,11 @@ public static class HubUIBuilder
         UIFactory.Place(name.rectTransform, Vector2.zero, Vector2.one, new Vector2(28f, 12f), new Vector2(-20f, -44f));
         UIFactory.Appear(title.gameObject);
 
+        // Botón de menú (pausa y opciones), al lado del título
+        hub.menuButton = UIFactory.ButtonCard("MenuButton", root, "MENU", 26);
+        UIFactory.Pin((RectTransform)hub.menuButton.transform, new Vector2(0f, 1f), new Vector2(M + 520f + 16f, -M), new Vector2(140f, 112f));
+        UIFactory.Appear(hub.menuButton.gameObject, 0.04f);
+
         // Contrato actual (arriba a la derecha)
         var status = UIFactory.Card("ContractCard", root, Palette.Blue);
         UIFactory.Pin(status, Vector2.one, new Vector2(-M, -M), new Vector2(560f, 140f));
@@ -32,8 +37,8 @@ public static class HubUIBuilder
 
         // Ayuda (abajo al centro)
         var hint = UIFactory.Card("HintCard", root, null, false);
-        UIFactory.Pin(hint, new Vector2(0.5f, 0f), new Vector2(0f, M), new Vector2(460f, 60f));
-        var hintText = UIFactory.Label("Text", hint, "Click a building to begin", 24, Palette.TextSecondary, FontKind.Body, TextAnchor.MiddleCenter);
+        UIFactory.Pin(hint, new Vector2(0.5f, 0f), new Vector2(0f, M), new Vector2(600f, 60f));
+        var hintText = UIFactory.Label("Text", hint, "Click a building to begin  ·  Esc: menu", 24, Palette.TextSecondary, FontKind.Body, TextAnchor.MiddleCenter);
         UIFactory.Stretch(hintText.rectTransform);
         UIFactory.Appear(hint.gameObject, 0.16f);
 

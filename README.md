@@ -289,7 +289,7 @@ El challenge pide explicar en simple, presentar los conceptos jugando y enseñar
 - [ ] Modo Libre
 - [ ] Ranking local (PlayerPrefs)
 - [ ] Misión real parecida en los resultados
-- [ ] Tutorial guiado
+- [x] Tutorial guiado
 - [ ] Mini desafío de separación de etapas (apretar espacio en el momento justo)
 
 ### Fuera de alcance

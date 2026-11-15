@@ -77,6 +77,7 @@ public class ResultsController : MonoBehaviour
 
         SetupWorld();
         FillPanel();
+        if (!ResultsContext.IsTestData) SaveData.RecordMission(run.contractTitle, run.result, run.science);
 
         hubButton.onClick.AddListener(() => Leave(hubScene, true));
         redesignButton.onClick.AddListener(() => Leave(hangarScene, false));
@@ -257,6 +258,29 @@ public class ResultsController : MonoBehaviour
         capcomGroup.alpha = 1f;
         eventCard.alpha = 1f;
         tradeCard.alpha = 1f;
+
+        Celebrate();
+    }
+
+    // Éxito: papelitos y fanfarria. Parcial: jingle corto. Falla: temblor y destello naranja.
+    void Celebrate()
+    {
+        if (run.result == ResultKind.Success)
+        {
+            GameShell.Confetti();
+            GameShell.Play(Sfx.Success);
+        }
+        else if (run.result == ResultKind.Partial)
+        {
+            GameShell.Play(Sfx.Partial);
+        }
+        else
+        {
+            GameShell.Play(Sfx.Fail);
+            if (GameShell.Instance != null) GameShell.Instance.Flash(new Color(orange.r, orange.g, orange.b, 0.35f));
+            var cam = FindAnyObjectByType<ResultsCamera>();
+            if (cam != null) cam.Shake(0.5f);
+        }
     }
 
     void Update()
@@ -281,6 +305,7 @@ public class ResultsController : MonoBehaviour
     {
         if (leaving) return;
         leaving = true;
+        GameShell.Play(Sfx.Whoosh);
         if (clearRun) ResultsContext.Clear();
         else if (ResultsContext.Current != null) ResultsContext.Current.resolved = false; // se vuelve a sortear al relanzar
         StartCoroutine(FadeOut(scene));

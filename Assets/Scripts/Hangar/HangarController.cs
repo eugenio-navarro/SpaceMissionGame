@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // Estado del armado en el hangar: qué piezas eligió el jugador y cómo da el cálculo.
 public class HangarController : MonoBehaviour
@@ -30,6 +29,7 @@ public class HangarController : MonoBehaviour
             Design.orbit = previous.orbit;
             Design.stations = previous.stations;
         }
+        else SaveData.LoadDesign(Contract.id, Design); // lo que quedó armado la última vez
         Recalculate();
     }
 
@@ -84,24 +84,34 @@ public class HangarController : MonoBehaviour
         Recalculate();
     }
 
+    // Saca todas las piezas (botón CLEAR ALL).
+    public void ClearDesign()
+    {
+        Design.instruments.Clear();
+        Design.panel = Design.battery = Design.antenna = Design.rocket = Design.orbit = null;
+        Design.stations = 1;
+        Recalculate();
+    }
+
     public void Launch()
     {
         if (!Report.CanLaunch) return;
         // Foto de la misión para Lanzamiento y Resultados (el evento y el dado se sortean en Lanzamiento).
         ResultsContext.Current = MissionHandoff.Build(Design, Report, Contract);
         ResultsContext.IsTestData = false;
-        SceneManager.LoadScene(launchScene);
+        GameShell.Load(launchScene);
     }
 
     public void BackToHub()
     {
         ResultsContext.Clear(); // el diseño guardado era para este contrato
-        SceneManager.LoadScene(hubScene);
+        GameShell.Load(hubScene);
     }
 
     void Recalculate()
     {
         Report = MissionCalculator.Evaluate(Design, Contract);
+        SaveData.SaveDesign(Contract.id, Design);
         Changed?.Invoke();
     }
 }

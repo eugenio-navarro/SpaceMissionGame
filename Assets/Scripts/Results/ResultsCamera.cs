@@ -11,6 +11,10 @@ public class ResultsCamera : MonoBehaviour
     public float speed = 0.12f;
     public float frameShift = 3.9f;   // corre el encuadre: el satélite queda a la izquierda
 
+    float shake; // temblor que se apaga solo (misión fallida)
+
+    public void Shake(float amount) => shake = amount;
+
     void LateUpdate()
     {
         if (target == null) return;
@@ -21,5 +25,11 @@ public class ResultsCamera : MonoBehaviour
 
         Vector3 right = Vector3.Cross(Vector3.up, -offset).normalized;
         transform.LookAt(target.position + right * frameShift);
+
+        if (shake > 0f)
+        {
+            transform.position += Random.insideUnitSphere * shake;
+            shake = Mathf.MoveTowards(shake, 0f, Time.deltaTime * 0.8f);
+        }
     }
 }
