@@ -116,7 +116,6 @@ public static class BuilderUtil
     // Canvas 1920x1080 escalable + EventSystem con el Input System nuevo.
     public static Canvas CreateCanvas()
     {
-        UIFactory.Sprite = UISprite;
         var go = new GameObject("Canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         go.layer = 5;
         var canvas = go.GetComponent<Canvas>();
@@ -126,12 +125,84 @@ public static class BuilderUtil
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = 0.5f;
 
+        var style = go.AddComponent<UIStyle>();
+        style.titleFont = FindFont("ChakraPetch-Bold");
+        style.bodyFont = FindFont("ChakraPetch-SemiBold");
+        style.monoFont = FindFont("ShareTechMono");
+        style.roundedFill = RoundedSprite("RoundedFill", 64, 32f, false, 0f, 20);
+        style.roundedOutline = RoundedSprite("RoundedOutline", 64, 32f, true, 0f, 20);
+        style.softShadow = RoundedSprite("SoftShadow", 128, 32f, false, 14f, 52);
+        style.Apply();
+
         var es = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
         es.GetComponent<InputSystemUIInputModule>().AssignDefaultActions();
         return canvas;
     }
 
-    public static Sprite UISprite => AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+    // ---------- Estilo: fuentes y sprites redondeados ----------
+
+    const string FontFolder = "Assets/UI/Fonts";
+    const string SpriteFolder = "Assets/UI/HubHangar";
+    const float CornerRadius = 18f;
+
+    // Busca la fuente en Assets/UI/Fonts ignorando guiones y espacios. Si no está, null (se usa la fuente por defecto).
+    static Font FindFont(string name)
+    {
+        if (!AssetDatabase.IsValidFolder(FontFolder)) return null;
+        string key = name.Replace("-", "").Replace(" ", "").ToLowerInvariant();
+        foreach (var guid in AssetDatabase.FindAssets("t:Font", new[] { FontFolder }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            string file = Path.GetFileNameWithoutExtension(path).Replace("-", "").Replace(" ", "").Replace("_", "").ToLowerInvariant();
+            if (file == key || file == key + "regular") return AssetDatabase.LoadAssetAtPath<Font>(path);
+        }
+        return null;
+    }
+
+    // Genera (una sola vez) un sprite de rectángulo redondeado: relleno, contorno de 1,5 px o sombra difusa.
+    static Sprite RoundedSprite(string name, int size, float inset, bool outline, float blur, int border)
+    {
+        string path = $"{SpriteFolder}/{name}.png";
+        if (!File.Exists(path))
+        {
+            Directory.CreateDirectory(SpriteFolder);
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            float half = size / 2f;
+            float boxHalf = half - (blur > 0f ? inset : 0f);
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                {
+                    var p = new Vector2(x + 0.5f - half, y + 0.5f - half);
+                    var q = new Vector2(Mathf.Abs(p.x), Mathf.Abs(p.y)) - Vector2.one * (boxHalf - CornerRadius);
+                    float d = new Vector2(Mathf.Max(q.x, 0f), Mathf.Max(q.y, 0f)).magnitude + Mathf.Min(Mathf.Max(q.x, q.y), 0f) - CornerRadius;
+                    float a;
+                    if (blur > 0f) { a = Mathf.Clamp01(0.5f - d / (2f * blur)); a *= a; }
+                    else if (outline) a = Mathf.Clamp01(1.25f - Mathf.Abs(d + 0.75f));
+                    else a = Mathf.Clamp01(0.5f - d);
+                    tex.SetPixel(x, y, new Color(1f, 1f, 1f, a));
+                }
+            File.WriteAllBytes(path, tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(path);
+        }
+
+        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+        var b = new Vector4(border, border, border, border);
+        if (importer.textureType != TextureImporterType.Sprite || importer.spriteBorder != b)
+        {
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.spritePixelsPerUnit = 100f;
+            importer.spriteBorder = b;
+            importer.alphaIsTransparency = true;
+            importer.mipmapEnabled = false;
+            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.filterMode = FilterMode.Bilinear;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.SaveAndReimport();
+        }
+        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+    }
 
     // Captura la cámara principal incluyendo la UI (pasa los Canvas a modo cámara por un momento).
     public static string Capture(string outPath, int width = 1600, int height = 900)

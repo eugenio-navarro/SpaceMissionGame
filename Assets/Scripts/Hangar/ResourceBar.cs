@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,21 +6,17 @@ public class ResourceBar : MonoBehaviour
 {
     public RectTransform fill;
     public Image fillImage;
-    public TMP_Text valueText;
+    public Text valueText;
 
-    // overIsBlocking: pasarse del límite bloquea el lanzamiento (rojo) o solo advierte (amarillo).
-    public void Set(float value, float max, string text, bool overIsBlocking = true)
+    public void Set(float value, float max, string text)
     {
         float ratio = max > 0f ? value / max : 0f;
         fill.anchorMax = new Vector2(Mathf.Clamp01(ratio), 1f);
 
-        Color color;
-        if (max <= 0f) color = Palette.Metal;
-        else if (ratio > 1f) color = overIsBlocking ? Palette.Red : Palette.Yellow;
-        else if (ratio > 0.9f) color = Palette.Yellow;
-        else color = Palette.Phosphor;
-
+        // Verde: todo bien. Naranja: cerca del límite o pasado.
+        Color color = max <= 0f ? Palette.Dim : ratio > 0.9f ? Palette.Orange : Palette.Green;
         fillImage.color = color;
         valueText.text = text;
+        valueText.color = max > 0f && ratio > 1f ? Palette.Orange : Palette.TextMain;
     }
 }
