@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public enum BuildingKind { MissionControl, Hangar, Antennas, Dome }
+public enum BuildingKind { MissionControl, Hangar, Antennas, Dome, LaunchPad }
 
 // Edificio clickeable del centro espacial. Necesita un Collider y un PhysicsRaycaster en la cámara.
 public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler

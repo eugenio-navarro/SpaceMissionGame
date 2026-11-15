@@ -95,6 +95,16 @@ public static class ShellScreens
         Button(window, "CLOSE", shell.CloseCredits);
     }
 
+    // ---------- Aviso ----------
+
+    public static void BuildNotice(GameShell shell, RectTransform layer, string caption, string title, string body)
+    {
+        var dim = Dim(layer);
+        var window = Window(dim, caption, title, 640f, Palette.Green);
+        UIFactory.Label("Body", window, body, 26, Palette.TextSecondary, FontKind.Body);
+        Button(window, "OK", shell.CloseCredits);
+    }
+
     static void Line(RectTransform parent, string caption, string text)
     {
         var box = UIFactory.Rect(caption, parent);

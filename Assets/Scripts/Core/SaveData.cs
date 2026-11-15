@@ -57,14 +57,36 @@ public static class SaveData
     public static int MissionsFlown => PlayerPrefs.GetInt("flown", 0);
 
     // Guarda una misión volada y el mejor resultado de cada contrato (0 = nada, 1 = falló, 2 = parcial, 3 = éxito).
-    public static void RecordMission(string contractTitle, ResultKind result, int science)
+    public static void RecordMission(string contractTitle, ResultKind result, int science, string rocket, string orbit, string headline)
     {
+        PlayerPrefs.SetString("last_" + contractTitle, $"{rocket}|{orbit}|{(int)result}|{science}|{headline}");
         PlayerPrefs.SetInt("flown", MissionsFlown + 1);
         int rank = result == ResultKind.Success ? 3 : result == ResultKind.Partial ? 2 : 1;
         string key = "best_" + contractTitle;
         if (rank > PlayerPrefs.GetInt(key, 0)) PlayerPrefs.SetInt(key, rank);
         if (science > PlayerPrefs.GetInt(key + "_science", -1)) PlayerPrefs.SetInt(key + "_science", science);
         PlayerPrefs.Save();
+    }
+
+    // Último vuelo de un contrato, o null si nunca se voló.
+    public static LastFlight Last(string contractTitle)
+    {
+        var p = PlayerPrefs.GetString("last_" + contractTitle, "").Split('|');
+        if (p.Length < 5) return null;
+        return new LastFlight
+        {
+            rocket = p[0], orbit = p[1],
+            result = (ResultKind)(int.TryParse(p[2], out int r) ? r : 0),
+            science = int.TryParse(p[3], out int sc) ? sc : 0,
+            headline = string.Join("|", p, 4, p.Length - 4),
+        };
+    }
+
+    public class LastFlight
+    {
+        public string rocket, orbit, headline;
+        public ResultKind result;
+        public int science;
     }
 
     public static int BestRank(string contractTitle) => PlayerPrefs.GetInt("best_" + contractTitle, 0);

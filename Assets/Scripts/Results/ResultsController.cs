@@ -77,7 +77,7 @@ public class ResultsController : MonoBehaviour
 
         SetupWorld();
         FillPanel();
-        if (!ResultsContext.IsTestData) SaveData.RecordMission(run.contractTitle, run.result, run.science);
+        if (!ResultsContext.IsTestData) RecordAndCheckUnlock();
 
         hubButton.onClick.AddListener(() => Leave(hubScene, true));
         redesignButton.onClick.AddListener(() => Leave(hangarScene, false));
@@ -262,6 +262,17 @@ public class ResultsController : MonoBehaviour
         Celebrate();
     }
 
+    ContractSpec newlyUnlocked; // contrato que se abrió con esta misión (se anuncia al final de la intro)
+
+    void RecordAndCheckUnlock()
+    {
+        var contract = TestCatalog.Contracts.Find(x => x.title == run.contractTitle);
+        var next = contract != null ? Campaign.Next(contract) : null;
+        bool wasLocked = next != null && !Campaign.IsUnlocked(next);
+        SaveData.RecordMission(run.contractTitle, run.result, run.science, run.rocketName, run.orbitName, run.headline);
+        if (wasLocked && Campaign.IsUnlocked(next)) newlyUnlocked = next;
+    }
+
     // Éxito: papelitos y fanfarria. Parcial: jingle corto. Falla: temblor y destello naranja.
     void Celebrate()
     {
@@ -269,6 +280,9 @@ public class ResultsController : MonoBehaviour
         {
             GameShell.Confetti();
             GameShell.Play(Sfx.Success);
+            if (newlyUnlocked != null)
+                GameShell.Announce("NEW CONTRACT UNLOCKED", newlyUnlocked.title,
+                    $"{newlyUnlocked.objective} Accept it at Mission Control in the Space Center.", 1.4f);
         }
         else if (run.result == ResultKind.Partial)
         {

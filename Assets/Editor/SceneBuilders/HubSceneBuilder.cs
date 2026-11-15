@@ -74,15 +74,17 @@ public static class HubSceneBuilder
     {
         var decor = Group("Decor", world, Vector3.zero);
 
-        // Plataforma de lanzamiento con un cohete parado
-        Model("LaunchPad", SpaceKit + "platform_large", decor, new Vector3(0f, 0f, 27f), 4f);
-        var rocket = Group("PadRocket", decor, new Vector3(0f, 0.4f, 27f));
+        // Plataforma de lanzamiento con un cohete parado (clickeable: lleva a preparar el lanzamiento)
+        var padArea = Group("LaunchPadArea", decor, new Vector3(0f, 0f, 27f));
+        Model("LaunchPad", SpaceKit + "platform_large", padArea, Vector3.zero, 4f);
+        var rocket = Group("PadRocket", padArea, new Vector3(0f, 0.4f, 0f));
         float y = 0f;
         foreach (var part in new[] { "rocket_baseA", "rocket_fuelA", "rocket_fuelA", "rocket_fuelA", "rocket_topA" })
         {
             var piece = Model(part, SpaceKit + part, rocket, new Vector3(0f, y, 0f), 2.2f);
             y += Height(piece);
         }
+        Interactable(padArea.gameObject, BuildingKind.LaunchPad, "Launch Pad");
 
         Model("Tank_A", CityKit + "detail-tank-large", decor, new Vector3(-25f, 0f, 18f), 3f);
         Model("Tank_B", CityKit + "detail-tank-large", decor, new Vector3(-20f, 0f, 25f), 3f, 90f);

@@ -50,7 +50,7 @@ public class HangarController : MonoBehaviour
     // Por qué una pieza no se puede elegir en este contrato, o null si se puede.
     public string UnavailableReason(PartSpec p)
     {
-        if (p.category == PartCategory.Instrument && Contract.IsLocked(p.id)) return "locked";
+        if (p.category == PartCategory.Instrument && Contract.IsLocked(p.id)) return "not in this contract";
         if (p.category == PartCategory.Orbit && !Contract.AllowsOrbit(p.id)) return "not allowed";
         return null;
     }

@@ -109,9 +109,12 @@ public static class HubUIBuilder
         row.childControlWidth = row.childControlHeight = true;
         row.childForceExpandWidth = row.childForceExpandHeight = true;
 
-        Color[] colors = { Palette.Planet, Palette.Hex("#6B4FB0"), Palette.Hex("#7D8794") };
-        for (int i = 0; i < TestCatalog.Contracts.Count; i++)
-            BuildCard(cards, TestCatalog.Contracts[i], colors[i], i, hub);
+        int n = TestCatalog.Contracts.Count;
+        hub.contractButtons = new Button[n];
+        hub.contractStatus = new Text[n];
+        hub.contractAccents = new Image[n];
+        for (int i = 0; i < n; i++)
+            BuildCard(cards, TestCatalog.Contracts[i], Campaign.DestinationColor(TestCatalog.Contracts[i]), i, hub);
 
         modal.gameObject.SetActive(false);
         return modal.gameObject;
@@ -119,7 +122,10 @@ public static class HubUIBuilder
 
     static void BuildCard(Transform parent, ContractSpec c, Color color, int index, HubController hub)
     {
-        var card = UIFactory.Card("Card_" + c.id, parent, c.unlocked ? Palette.Orange : Palette.Dim, false);
+        // El estado (bloqueado, aceptado, completado) lo pone HubController en tiempo de ejecución.
+        var card = UIFactory.Card("Card_" + c.id, parent, Palette.Orange, false);
+        hub.contractAccents[index] = card.Find("Accent").GetComponent<Image>();
+        UIFactory.Layout(card.gameObject, -1f, 400f, 1f); // las tres tarjetas del mismo ancho
         UIFactory.Vertical(card.gameObject, 26, 22, 22, 22, 10f);
 
         var destination = UIFactory.Image("Destination", card, UIFactory.RoundedFill, color);
@@ -139,12 +145,17 @@ public static class HubUIBuilder
         var spacer = UIFactory.Rect("Spacer", card);
         UIFactory.Layout(spacer.gameObject, -1f, -1f, -1f, 1f);
 
-        var button = c.unlocked
-            ? UIFactory.ButtonCard("Accept", card, "ACCEPT", 30)
-            : UIFactory.ButtonCard("Locked", card, "LOCKED", 30, Palette.Dim);
+        hub.contractStatus[index] = UIFactory.Label("Status", card, "", 20, Palette.TextSecondary, FontKind.Title, TextAnchor.MiddleCenter);
+        UIFactory.Layout(hub.contractStatus[index].gameObject, 28f);
+        hub.contractStatus[index].verticalOverflow = VerticalWrapMode.Truncate;
+        hub.contractStatus[index].resizeTextForBestFit = true;
+        hub.contractStatus[index].resizeTextMinSize = 13;
+        hub.contractStatus[index].resizeTextMaxSize = 20;
+
+        var button = UIFactory.ButtonCard("Accept", card, "ACCEPT", 30);
         UIFactory.Layout(button.gameObject, 68f);
-        button.interactable = c.unlocked;
-        if (c.unlocked) UnityEventTools.AddIntPersistentListener(button.onClick, hub.AcceptContract, index);
+        UnityEventTools.AddIntPersistentListener(button.onClick, hub.AcceptContract, index);
+        hub.contractButtons[index] = button;
     }
 
     static void DataLine(Transform card, string caption, string value, FontKind kind = FontKind.Mono)

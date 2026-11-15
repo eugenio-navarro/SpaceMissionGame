@@ -198,6 +198,19 @@ public class GameShell : MonoBehaviour
         loop.UnPause();
     }
 
+    // Ventana de aviso con OK (por ejemplo, un contrato nuevo desbloqueado).
+    public static void Announce(string caption, string title, string body, float delay = 0f)
+    {
+        if (Instance != null) Instance.StartCoroutine(Instance.AnnounceRoutine(caption, title, body, delay));
+    }
+
+    IEnumerator AnnounceRoutine(string caption, string title, string body, float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        Play(Sfx.Accept);
+        ShellScreens.BuildNotice(this, creditsLayer, caption, title, body);
+    }
+
     public void OpenCredits() => ShellScreens.BuildCredits(this, creditsLayer);
     public void CloseCredits() => Clear(creditsLayer);
 

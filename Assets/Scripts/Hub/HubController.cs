@@ -1,4 +1,3 @@
-using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -27,13 +26,19 @@ public class HubController : MonoBehaviour
     public GameObject toast;
     public Text toastText;
     public Button menuButton;
+    public Button[] contractButtons; // uno por contrato, en el orden de TestCatalog.Contracts
+    public Text[] contractStatus;
+    public Image[] contractAccents;
 
     float toastUntil;
     CanvasGroup toastGroup;
     Canvas canvas;
     bool titleOpen;
+    StationsPanel stationsPanel;
+    ArchivePanel archivePanel;
 
-    bool AnyPanelOpen => contractsPanel.activeSelf || infoPanel.activeSelf;
+    bool AnyPanelOpen => contractsPanel.activeSelf || infoPanel.activeSelf
+        || stationsPanel.gameObject.activeSelf || archivePanel.gameObject.activeSelf;
 
     // Mientras hay un panel, el título o la pausa, los edificios no responden.
     public bool Busy => AnyPanelOpen || titleOpen || (GameShell.Instance != null && GameShell.Instance.MenuOpen);
@@ -41,6 +46,9 @@ public class HubController : MonoBehaviour
     void Start()
     {
         canvas = tooltip.GetComponentInParent<Canvas>().rootCanvas;
+        stationsPanel = StationsPanel.Create(canvas.transform, this);
+        archivePanel = ArchivePanel.Create(canvas.transform, this);
+        tooltip.SetAsLastSibling(); // tooltip y aviso, por encima de los paneles nuevos
         toastGroup = toast.GetComponent<CanvasGroup>();
         toast.SetActive(false);
         CloseAll();
@@ -110,6 +118,7 @@ public class HubController : MonoBehaviour
         {
             case BuildingKind.MissionControl:
                 toast.SetActive(false);
+                RefreshContracts();
                 contractsPanel.SetActive(true);
                 break;
             case BuildingKind.Hangar:
@@ -120,41 +129,30 @@ public class HubController : MonoBehaviour
                 }
                 else GameShell.Load(hangarScene);
                 break;
+            case BuildingKind.LaunchPad:
+                // Los cohetes salen de acá, pero el satélite se arma y se lanza desde el hangar.
+                if (string.IsNullOrEmpty(AcceptedContractId))
+                {
+                    GameShell.Play(Sfx.Deny);
+                    Toast("Rockets launch from here. First pick a contract at Mission Control.");
+                }
+                else GameShell.Load(hangarScene);
+                break;
             case BuildingKind.Antennas:
-                ShowInfo("Ground Stations",
-                    "Antennas on Earth that talk to your satellite. More stations = more data reaches home.\n\n" +
-                    "Coming soon. For now, pick them in the Hangar (Comms tab).");
+                toast.SetActive(false);
+                stationsPanel.Open();
                 break;
             case BuildingKind.Dome:
-                ShowInfo("Mission Archive", ArchiveText());
+                toast.SetActive(false);
+                archivePanel.Open();
                 break;
         }
-    }
-
-    // Mejores resultados guardados de cada contrato.
-    static string ArchiveText()
-    {
-        int flown = SaveData.MissionsFlown;
-        if (flown == 0) return "No missions flown yet.\n\nLaunch your first satellite and its result will be saved here.";
-
-        var sb = new StringBuilder();
-        sb.AppendLine($"Missions flown: <color={Palette.Tag(Palette.TextMain)}>{flown}</color>\n");
-        foreach (var c in TestCatalog.Contracts)
-        {
-            int rank = SaveData.BestRank(c.title);
-            if (rank == 0) continue;
-            string label = rank == 3 ? $"<color={Palette.Tag(Palette.Green)}>SUCCESS</color>"
-                : rank == 2 ? $"<color={Palette.Tag(Palette.Orange)}>PARTIAL</color>"
-                : $"<color={Palette.Tag(Palette.Orange)}>FAILED</color>";
-            sb.AppendLine($"<color={Palette.Tag(Palette.TextMain)}>{c.title}</color>   best: {label}   science {SaveData.BestScience(c.title)}/{c.scienceGoal}");
-        }
-        return sb.ToString();
     }
 
     public void AcceptContract(int index)
     {
         var contract = TestCatalog.Contracts[index];
-        if (!contract.unlocked) return;
+        if (!Campaign.IsUnlocked(contract)) return;
         AcceptedContractId = contract.id;
         CloseAll();
         RefreshStatus();
@@ -166,13 +164,32 @@ public class HubController : MonoBehaviour
     {
         contractsPanel.SetActive(false);
         infoPanel.SetActive(false);
+        if (stationsPanel != null) stationsPanel.gameObject.SetActive(false);
+        if (archivePanel != null) archivePanel.gameObject.SetActive(false);
     }
 
-    void ShowInfo(string title, string body)
+    // Estado de cada tarjeta de contrato según la campaña: bloqueado, disponible, aceptado o completado.
+    void RefreshContracts()
     {
-        infoTitle.text = title;
-        infoBody.text = body;
-        infoPanel.SetActive(true);
+        for (int i = 0; i < contractButtons.Length; i++)
+        {
+            var c = TestCatalog.Contracts[i];
+            bool open = Campaign.IsUnlocked(c);
+            bool accepted = c.id == AcceptedContractId;
+            int rank = SaveData.BestRank(c.title);
+
+            contractButtons[i].GetComponentInChildren<Text>().text =
+                !open ? "LOCKED" : accepted ? "ACCEPTED" : rank > 0 ? "FLY AGAIN" : "ACCEPT";
+            contractButtons[i].interactable = open && !accepted;
+            contractAccents[i].color = open ? Palette.Orange : Palette.Dim;
+
+            var status = contractStatus[i];
+            if (!open) { status.text = $"UNLOCKS AFTER {Campaign.Previous(c)?.title.ToUpperInvariant()}"; status.color = Palette.Dim; }
+            else if (rank == 3) { status.text = $"COMPLETED · BEST {SaveData.BestScience(c.title)} SCIENCE"; status.color = Palette.Green; }
+            else if (rank > 0) { status.text = $"NOT DONE YET · BEST {SaveData.BestScience(c.title)} SCIENCE"; status.color = Palette.Orange; }
+            else if (accepted) { status.text = "CURRENT CONTRACT · GO TO THE HANGAR"; status.color = Palette.Green; }
+            else { status.text = "NEW CONTRACT"; status.color = Palette.Blue; }
+        }
     }
 
     void RefreshStatus()
