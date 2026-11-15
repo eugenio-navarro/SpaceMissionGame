@@ -17,6 +17,19 @@ public class HangarController : MonoBehaviour
     void Awake()
     {
         Contract = TestCatalog.Contract(HubController.AcceptedContractId);
+
+        // Volviendo de Resultados con "Redesign": se recupera el diseño anterior.
+        var previous = ResultsContext.Current != null ? ResultsContext.Current.design : null;
+        if (previous != null && !ResultsContext.IsTestData)
+        {
+            Design.instruments.AddRange(previous.instruments);
+            Design.panel = previous.panel;
+            Design.battery = previous.battery;
+            Design.antenna = previous.antenna;
+            Design.rocket = previous.rocket;
+            Design.orbit = previous.orbit;
+            Design.stations = previous.stations;
+        }
         Recalculate();
     }
 
@@ -73,10 +86,18 @@ public class HangarController : MonoBehaviour
 
     public void Launch()
     {
-        if (Report.CanLaunch) SceneManager.LoadScene(launchScene);
+        if (!Report.CanLaunch) return;
+        // Foto de la misión para Lanzamiento y Resultados (el evento y el dado se sortean en Lanzamiento).
+        ResultsContext.Current = MissionHandoff.Build(Design, Report, Contract);
+        ResultsContext.IsTestData = false;
+        SceneManager.LoadScene(launchScene);
     }
 
-    public void BackToHub() => SceneManager.LoadScene(hubScene);
+    public void BackToHub()
+    {
+        ResultsContext.Clear(); // el diseño guardado era para este contrato
+        SceneManager.LoadScene(hubScene);
+    }
 
     void Recalculate()
     {

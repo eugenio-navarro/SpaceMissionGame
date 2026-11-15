@@ -13,6 +13,7 @@ public static class UIFactory
 
     public static Font TitleFont, BodyFont, MonoFont;
     public static Sprite RoundedFill, RoundedOutline, SoftShadow;
+    public static float SpriteScale = 1f; // los sprites de Assets/UI/Launch están al doble de resolución
 
     public static Font FontFor(FontKind kind)
     {
@@ -53,6 +54,7 @@ public static class UIFactory
         var img = rt.gameObject.AddComponent<Image>();
         img.sprite = sprite;
         img.type = sprite != null ? UnityEngine.UI.Image.Type.Sliced : UnityEngine.UI.Image.Type.Simple;
+        img.pixelsPerUnitMultiplier = SpriteScale;
         img.color = color;
         img.raycastTarget = raycast;
         return img;
@@ -87,7 +89,7 @@ public static class UIFactory
         if (shadow && SoftShadow != null)
         {
             var s = Image("Shadow", root, SoftShadow, new Color(0f, 0f, 0f, 0.5f));
-            Place(s.rectTransform, Vector2.zero, Vector2.one, new Vector2(-32f, -38f), new Vector2(32f, 26f));
+            Place(s.rectTransform, Vector2.zero, Vector2.one, new Vector2(-24f, -24f), new Vector2(24f, 24f));
             IgnoreLayout(s.gameObject);
         }
         var fill = Image("Fill", root, RoundedFill, Palette.CardBackground, true);
@@ -100,10 +102,9 @@ public static class UIFactory
 
         if (accent.HasValue)
         {
+            // Misma barra que las tarjetas de Lanzamiento: 5 px, a 12 px del borde, 16 px arriba y abajo.
             var bar = Image("Accent", root, RoundedFill, accent.Value);
-            bar.type = UnityEngine.UI.Image.Type.Simple;
-            bar.sprite = null;
-            Place(bar.rectTransform, Vector2.zero, new Vector2(0f, 1f), new Vector2(0f, 18f), new Vector2(AccentWidth, -18f));
+            Place(bar.rectTransform, Vector2.zero, new Vector2(0f, 1f), new Vector2(12f - AccentWidth / 2f, 16f), new Vector2(12f + AccentWidth / 2f, -16f));
             IgnoreLayout(bar.gameObject);
         }
         return root;

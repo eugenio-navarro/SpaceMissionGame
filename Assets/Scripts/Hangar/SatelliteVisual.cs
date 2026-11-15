@@ -22,6 +22,7 @@ public class SatelliteVisual : MonoBehaviour
 
     void Start()
     {
+        if (controller == null) return; // en Resultados se llama a Show() directamente
         controller.Changed += Refresh;
         Refresh();
     }
@@ -31,10 +32,12 @@ public class SatelliteVisual : MonoBehaviour
         if (controller != null) controller.Changed -= Refresh;
     }
 
-    void Refresh()
+    void Refresh() => Show(controller.Design);
+
+    public void Show(MissionDesign d)
     {
-        var d = controller.Design;
         foreach (var e in parts) e.root.SetActive(IsOn(d, e.id));
+        if (noRocketTop == null) return; // sin cohetes (Resultados)
 
         Transform top = noRocketTop;
         foreach (var e in rockets)

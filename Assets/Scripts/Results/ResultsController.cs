@@ -9,6 +9,7 @@ public class ResultsController : MonoBehaviour
 {
     [Header("Escena 3D")]
     public Transform satellite;
+    public SatelliteVisual parts; // muestra solo las piezas que eligió el jugador
     public Transform[] solarPanels;
     public Renderer[] panelRenderers;
     public Light sun;
@@ -55,9 +56,7 @@ public class ResultsController : MonoBehaviour
 
     [Header("Colores")]
     public Color green = new Color(0.48f, 0.85f, 0.56f);
-    public Color yellow = new Color(0.95f, 0.79f, 0.30f);
     public Color orange = new Color(0.94f, 0.47f, 0.16f);
-    public Color red = new Color(0.90f, 0.28f, 0.30f);
 
     public string hubScene = "CentroEspacial";
     public string hangarScene = "Hangar";
@@ -108,6 +107,8 @@ public class ResultsController : MonoBehaviour
 
     void SetupWorld()
     {
+        if (parts != null) parts.Show(run.design ?? ReferenceDesign());
+
         bool moon = run.destination == "MOON";
         if (planetRenderer != null)
         {
@@ -129,7 +130,8 @@ public class ResultsController : MonoBehaviour
 
     void FillPanel()
     {
-        Color accent = run.result == ResultKind.Success ? green : run.result == ResultKind.Partial ? orange : red;
+        // Guía de estética: verde = todo bien, naranja = alerta (igual que en el Hangar).
+        Color accent = run.result == ResultKind.Success ? green : orange;
 
         resultTitle.text = run.result == ResultKind.Success ? "MISSION SUCCESS"
             : run.result == ResultKind.Partial ? "PARTIAL SUCCESS" : "MISSION FAILED";
@@ -157,7 +159,7 @@ public class ResultsController : MonoBehaviour
             run.budget > 0 ? run.cost / (float)run.budget : 0f, MarginColor(run.BudgetMargin));
         float dataRatio = run.dataGenerated > 0f ? run.received / run.dataGenerated : 0f;
         SetStat(3, run.received.ToString("0") + " of " + run.dataGenerated.ToString("0") + " GB/day",
-            dataRatio, dataRatio > 0.99f ? green : dataRatio > 0.6f ? yellow : red);
+            dataRatio, dataRatio > 0.99f ? green : orange);
 
         whyText.text = run.why;
         tryNextText.text = run.tryNext;
@@ -190,13 +192,8 @@ public class ResultsController : MonoBehaviour
         return d;
     }
 
-    // Verde si sobra 30% o más, amarillo si sobra 10%, rojo si queda menos.
-    Color MarginColor(float margin)
-    {
-        if (margin >= 0.30f) return green;
-        if (margin >= 0.10f) return yellow;
-        return red;
-    }
+    // Igual que las barras del Hangar: verde si sobra 10% o más, naranja si queda menos.
+    Color MarginColor(float margin) => margin >= 0.10f ? green : orange;
 
     void SetStat(int i, string value, float ratio, Color color)
     {

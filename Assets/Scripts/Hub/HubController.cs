@@ -67,6 +67,7 @@ public class HubController : MonoBehaviour
         switch (kind)
         {
             case BuildingKind.MissionControl:
+                toast.SetActive(false);
                 contractsPanel.SetActive(true);
                 break;
             case BuildingKind.Hangar:
@@ -126,6 +127,7 @@ public class HubController : MonoBehaviour
     void Toast(string message)
     {
         toastText.text = message;
+        toast.transform.SetAsLastSibling(); // siempre por encima de los paneles
         toast.SetActive(false); // reinicia la animación de entrada
         toast.SetActive(true);
         toastUntil = Time.unscaledTime + 3f;

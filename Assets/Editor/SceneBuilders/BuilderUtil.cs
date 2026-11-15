@@ -129,9 +129,11 @@ public static class BuilderUtil
         style.titleFont = FindFont("ChakraPetch-Bold");
         style.bodyFont = FindFont("ChakraPetch-SemiBold");
         style.monoFont = FindFont("ShareTechMono");
-        style.roundedFill = RoundedSprite("RoundedFill", 64, 32f, false, 0f, 20);
-        style.roundedOutline = RoundedSprite("RoundedOutline", 64, 32f, true, 0f, 20);
-        style.softShadow = RoundedSprite("SoftShadow", 128, 32f, false, 14f, 52);
+        // Mismos sprites que Lanzamiento y Resultados (Assets/UI/Launch, al doble de resolución)
+        style.roundedFill = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + "rounded.png");
+        style.roundedOutline = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + "outline.png");
+        style.softShadow = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + "shadow.png");
+        style.spriteScale = 2f;
         style.Apply();
 
         var es = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
@@ -142,8 +144,7 @@ public static class BuilderUtil
     // ---------- Estilo: fuentes y sprites redondeados ----------
 
     const string FontFolder = "Assets/UI/Fonts";
-    const string SpriteFolder = "Assets/UI/HubHangar";
-    const float CornerRadius = 18f;
+    const string SpriteFolder = "Assets/UI/Launch/";
 
     // Busca la fuente en Assets/UI/Fonts ignorando guiones y espacios. Si no está, null (se usa la fuente por defecto).
     static Font FindFont(string name)
@@ -157,51 +158,6 @@ public static class BuilderUtil
             if (file == key || file == key + "regular") return AssetDatabase.LoadAssetAtPath<Font>(path);
         }
         return null;
-    }
-
-    // Genera (una sola vez) un sprite de rectángulo redondeado: relleno, contorno de 1,5 px o sombra difusa.
-    static Sprite RoundedSprite(string name, int size, float inset, bool outline, float blur, int border)
-    {
-        string path = $"{SpriteFolder}/{name}.png";
-        if (!File.Exists(path))
-        {
-            Directory.CreateDirectory(SpriteFolder);
-            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            float half = size / 2f;
-            float boxHalf = half - (blur > 0f ? inset : 0f);
-            for (int y = 0; y < size; y++)
-                for (int x = 0; x < size; x++)
-                {
-                    var p = new Vector2(x + 0.5f - half, y + 0.5f - half);
-                    var q = new Vector2(Mathf.Abs(p.x), Mathf.Abs(p.y)) - Vector2.one * (boxHalf - CornerRadius);
-                    float d = new Vector2(Mathf.Max(q.x, 0f), Mathf.Max(q.y, 0f)).magnitude + Mathf.Min(Mathf.Max(q.x, q.y), 0f) - CornerRadius;
-                    float a;
-                    if (blur > 0f) { a = Mathf.Clamp01(0.5f - d / (2f * blur)); a *= a; }
-                    else if (outline) a = Mathf.Clamp01(1.25f - Mathf.Abs(d + 0.75f));
-                    else a = Mathf.Clamp01(0.5f - d);
-                    tex.SetPixel(x, y, new Color(1f, 1f, 1f, a));
-                }
-            File.WriteAllBytes(path, tex.EncodeToPNG());
-            Object.DestroyImmediate(tex);
-            AssetDatabase.ImportAsset(path);
-        }
-
-        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
-        var b = new Vector4(border, border, border, border);
-        if (importer.textureType != TextureImporterType.Sprite || importer.spriteBorder != b)
-        {
-            importer.textureType = TextureImporterType.Sprite;
-            importer.spriteImportMode = SpriteImportMode.Single;
-            importer.spritePixelsPerUnit = 100f;
-            importer.spriteBorder = b;
-            importer.alphaIsTransparency = true;
-            importer.mipmapEnabled = false;
-            importer.wrapMode = TextureWrapMode.Clamp;
-            importer.filterMode = FilterMode.Bilinear;
-            importer.textureCompression = TextureImporterCompression.Uncompressed;
-            importer.SaveAndReimport();
-        }
-        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
     }
 
     // Captura la cámara principal incluyendo la UI (pasa los Canvas a modo cámara por un momento).

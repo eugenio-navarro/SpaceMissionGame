@@ -61,7 +61,7 @@ public static class ResultsSceneBuilder
         // ---------- Satélite ----------
         List<Transform> wings = new List<Transform>();
         List<Renderer> panelRenderers = new List<Renderer>();
-        GameObject satellite = Satellite(wings, panelRenderers);
+        GameObject satellite = DesignSatellite(wings, panelRenderers, out SatelliteVisual partsVisual);
 
         // ---------- Cámara ----------
         Camera cam = Camera.main;
@@ -87,6 +87,7 @@ public static class ResultsSceneBuilder
         // ---------- Controlador y UI ----------
         ResultsController controller = new GameObject("ResultsController").AddComponent<ResultsController>();
         controller.satellite = satellite.transform;
+        controller.parts = partsVisual;
         controller.solarPanels = wings.ToArray();
         controller.panelRenderers = panelRenderers.ToArray();
         controller.sun = sun;
@@ -105,57 +106,28 @@ public static class ResultsSceneBuilder
 
     // ================= Satélite =================
 
-    static GameObject Satellite(List<Transform> wings, List<Renderer> panelRenderers)
+    // El mismo satélite del Hangar (HangarSceneBuilder.BuildSatellite): en Play muestra solo las piezas
+    // que eligió el jugador. Las alas (paneles chico y grande) se despliegan escalándolas en X.
+    static GameObject DesignSatellite(List<Transform> wings, List<Renderer> panelRenderers, out SatelliteVisual visual)
     {
-        Material gold = Lit("Results_Foil", new Color(0.86f, 0.66f, 0.22f), 0.7f, 0.55f);
-        Material metal = Lit("Results_Metal", new Color(0.72f, 0.75f, 0.80f), 0.6f, 0.45f);
-        Material dark = Lit("Results_Dark", new Color(0.10f, 0.11f, 0.14f), 0.3f, 0.5f);
-        Material white = Lit("Results_White", new Color(0.93f, 0.94f, 0.96f), 0f, 0.3f);
-        Material cells = Lit("Results_SolarCells", new Color(0.09f, 0.20f, 0.55f), 0.4f, 0.8f);
-
         GameObject sat = new GameObject("Satellite");
         sat.transform.rotation = Quaternion.Euler(8f, 25f, -6f);
-        Transform t = sat.transform;
+        visual = sat.AddComponent<SatelliteVisual>();
+        var parts = new GameObject("Parts").transform;
+        parts.SetParent(sat.transform, false);
+        parts.localPosition = new Vector3(0f, -0.85f, 0f); // el cuerpo queda centrado en el satélite
+        parts.localScale = Vector3.one * 1.3f;
+        visual.satellite = parts;
+        HangarSceneBuilder.BuildSatellite(visual);
 
-        Part(PrimitiveType.Cube, "Body", t, new Vector3(0f, 0f, 0f), new Vector3(1.1f, 1.4f, 1.1f), gold);
-        Part(PrimitiveType.Cylinder, "Ring", t, new Vector3(0f, -0.78f, 0f), new Vector3(0.95f, 0.08f, 0.95f), metal);
-        Part(PrimitiveType.Cylinder, "Instrument", t, new Vector3(0f, -1.12f, 0f), new Vector3(0.55f, 0.28f, 0.55f), dark);
-        Part(PrimitiveType.Cylinder, "Lens", t, new Vector3(0f, -1.42f, 0f), new Vector3(0.36f, 0.03f, 0.36f), cells);
-        Part(PrimitiveType.Cylinder, "Mast", t, new Vector3(0f, 0.9f, 0f), new Vector3(0.08f, 0.2f, 0.08f), metal);
-        Part(PrimitiveType.Sphere, "Dish", t, new Vector3(0f, 1.12f, 0f), new Vector3(1.0f, 0.22f, 1.0f), white);
-        Part(PrimitiveType.Cylinder, "Feed", t, new Vector3(0f, 1.32f, 0f), new Vector3(0.05f, 0.14f, 0.05f), metal);
-
-        for (int side = 0; side < 2; side++)
+        foreach (var entry in visual.parts)
         {
-            // El pivote está pegado al cuerpo: al escalarlo en X el panel se despliega hacia afuera.
-            GameObject wing = new GameObject(side == 0 ? "WingRight" : "WingLeft");
-            wing.transform.SetParent(t, false);
-            wing.transform.localPosition = new Vector3(side == 0 ? 0.55f : -0.55f, 0.1f, 0f);
-            wing.transform.localRotation = Quaternion.Euler(0f, side == 0 ? 0f : 180f, 0f);
-            wings.Add(wing.transform);
-
-            Part(PrimitiveType.Cube, "Arm", wing.transform, new Vector3(0.3f, 0f, 0f), new Vector3(0.6f, 0.06f, 0.06f), metal);
-            for (int i = 0; i < 2; i++)
-            {
-                GameObject cell = Part(PrimitiveType.Cube, "Panel" + i, wing.transform,
-                    new Vector3(1.35f + i * 1.6f, 0f, 0f), new Vector3(1.5f, 0.04f, 1.0f), cells);
-                cell.transform.localRotation = Quaternion.Euler(20f, 0f, 0f);
-                panelRenderers.Add(cell.GetComponent<Renderer>());
-            }
+            if (!entry.id.StartsWith("panel_")) continue;
+            wings.Add(entry.root.transform);
+            foreach (Renderer r in entry.root.GetComponentsInChildren<Renderer>())
+                if (r.name == "Cells") panelRenderers.Add(r);
         }
         return sat;
-    }
-
-    static GameObject Part(PrimitiveType type, string name, Transform parent, Vector3 position, Vector3 scale, Material mat)
-    {
-        GameObject go = GameObject.CreatePrimitive(type);
-        go.name = name;
-        go.transform.SetParent(parent, false);
-        go.transform.localPosition = position;
-        go.transform.localScale = scale;
-        go.GetComponent<Renderer>().sharedMaterial = mat;
-        Object.DestroyImmediate(go.GetComponent<Collider>());
-        return go;
     }
 
     // ================= Materiales y malla =================
@@ -262,6 +234,7 @@ public static class ResultsSceneBuilder
         c.eventCard = ev.gameObject.AddComponent<CanvasGroup>();
         Txt("EventLabel", ev, semi, 15, muted, TextAnchor.UpperLeft, "LAUNCH EVENT", 28f, 18f, 410f, 20f);
         c.eventTitleText = Txt("EventTitle", ev, bold, 28, white, TextAnchor.UpperLeft, "", 28f, 42f, 410f, 36f);
+        BestFit(c.eventTitleText, 16, 28); // "GROUND STATION INTERFERENCE" entra en una línea
         c.eventBodyText = Txt("EventBody", ev, semi, 20, muted, TextAnchor.UpperLeft, "", 28f, 82f, 410f, 100f);
         BestFit(c.eventBodyText, 15, 20);
         c.riskText = Txt("RiskRoll", ev, mono, 21, white, TextAnchor.UpperLeft, "", 28f, 192f, 410f, 28f);
@@ -284,7 +257,13 @@ public static class ResultsSceneBuilder
             new Vector2(14f, 0f), new Vector2(126f, 40f));
         LaunchHudBuilder.Label("TagText", tag.transform, bold, 18, ink, TextAnchor.MiddleCenter, "CAPCOM", 0f, 0f, 0f, 0f);
         c.capcomText = LaunchHudBuilder.Label("CapcomText", capcom, semi, 26, white, TextAnchor.MiddleLeft, "", 160f, 0f, 24f, 0f);
-        c.capcomText.horizontalOverflow = HorizontalWrapMode.Overflow;
+        BestFit(c.capcomText, 16, 26);
+        // Se estira hasta el panel de la derecha: en 4:3 o 16:10 no se encima con él.
+        capcom.anchorMin = Vector2.zero;
+        capcom.anchorMax = new Vector2(1f, 0f);
+        capcom.pivot = Vector2.zero;
+        capcom.offsetMin = new Vector2(36f, 56f);
+        capcom.offsetMax = new Vector2(-(36f + 640f + 24f), 124f);
 
         // ---------- Panel de resultados (a la derecha) ----------
         const float W = 640f, pad = 36f, inner = W - pad * 2f;
@@ -363,9 +342,8 @@ public static class ResultsSceneBuilder
 
         // Botones
         float half = (inner - 16f) * 0.5f;
-        c.hubButton = MakeButton("HubButton", panel, pad, 934f, half, 56f, "SPACE CENTER", bold, orange, ink);
-        c.redesignButton = MakeButton("RedesignButton", panel, pad + half + 16f, 934f, half, 56f, "REDESIGN", bold,
-            new Color(0.12f, 0.16f, 0.23f, 1f), orange);
+        c.hubButton = MakeButton("HubButton", panel, pad, 934f, half, 56f, "<  SPACE CENTER", bold, orange);
+        c.redesignButton = MakeButton("RedesignButton", panel, pad + half + 16f, 934f, half, 56f, "REDESIGN", bold, orange);
 
         // ---------- Fundido a negro, encima de todo ----------
         Image fade = LaunchHudBuilder.Img("Fade", root, null, Color.black, false);
@@ -403,21 +381,28 @@ public static class ResultsSceneBuilder
             new Vector2(0f, -top), new Vector2(-72f, 1.5f));
     }
 
+    // Botón = tarjeta con texto naranja en negrita (igual que en el resto del juego):
+    // al pasar el mouse el borde se pone naranja y hace un rebote chico (CardButtonFx).
     static Button MakeButton(string name, Transform parent, float x, float top, float width, float height, string label,
-        Font font, Color fillColor, Color textColor)
+        Font font, Color textColor)
     {
-        Image img = LaunchHudBuilder.Img(name, parent, LaunchHudBuilder.rounded, Color.white, true);
+        Image img = LaunchHudBuilder.Img(name, parent, LaunchHudBuilder.rounded, new Color(0.12f, 0.16f, 0.23f, 1f), true);
         Place(img.rectTransform, x, top, width, height);
         img.raycastTarget = true;
+        Image border = LaunchHudBuilder.Img("Border", img.transform, LaunchHudBuilder.outline, LaunchHudBuilder.PanelLine, true);
+        LaunchHudBuilder.Stretch(border.rectTransform, 0f, 0f, 0f, 0f);
+
         Button button = img.gameObject.AddComponent<Button>();
         button.targetGraphic = img;
-        ColorBlock colors = button.colors;
-        colors.normalColor = fillColor;
-        colors.highlightedColor = Color.Lerp(fillColor, Color.white, 0.18f);
-        colors.pressedColor = Color.Lerp(fillColor, Color.black, 0.25f);
-        colors.selectedColor = fillColor;
-        button.colors = colors;
-        LaunchHudBuilder.Label("Label", img.transform, font, 20, textColor, TextAnchor.MiddleCenter, label, 0f, 0f, 0f, 0f);
+        button.transition = Selectable.Transition.None;
+        Text text = LaunchHudBuilder.Label("Label", img.transform, font, 22, textColor, TextAnchor.MiddleCenter, label, 0f, 0f, 0f, 0f);
+
+        CardButtonFx fx = img.gameObject.AddComponent<CardButtonFx>();
+        fx.button = button;
+        fx.border = border;
+        fx.label = text;
+        fx.labelColor = textColor;
+        fx.borderColor = LaunchHudBuilder.PanelLine;
         return button;
     }
 }

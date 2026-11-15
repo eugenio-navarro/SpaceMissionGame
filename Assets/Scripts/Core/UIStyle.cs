@@ -11,6 +11,7 @@ public class UIStyle : MonoBehaviour
     public Sprite roundedFill;
     public Sprite roundedOutline;
     public Sprite softShadow;
+    public float spriteScale = 2f;
 
     void Awake() => Apply();
 
@@ -22,5 +23,6 @@ public class UIStyle : MonoBehaviour
         UIFactory.RoundedFill = roundedFill;
         UIFactory.RoundedOutline = roundedOutline;
         UIFactory.SoftShadow = softShadow;
+        UIFactory.SpriteScale = spriteScale;
     }
 }

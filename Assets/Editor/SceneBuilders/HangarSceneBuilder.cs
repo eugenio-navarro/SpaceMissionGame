@@ -139,7 +139,7 @@ public static class HangarSceneBuilder
         return y;
     }
 
-    static void BuildSatellite(SatelliteVisual visual)
+    public static void BuildSatellite(SatelliteVisual visual)
     {
         var metal = Mat("SatMetal", Palette.Metal, 0.8f, 0.6f);
         var gold = Mat("SatGold", Palette.Hex("#C9A227"), 0.9f, 0.7f);

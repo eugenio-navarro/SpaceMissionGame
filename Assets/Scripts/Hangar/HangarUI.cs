@@ -63,8 +63,8 @@ public class HangarUI : MonoBehaviour
 
         massBar.Set(r.mass, r.capacity, r.capacity > 0f ? $"{r.mass:0} / {r.capacity:0} kg" : $"{r.mass:0} kg");
         powerBar.Set(r.consumption, r.generation, r.generation > 0f ? $"{r.consumption:0} / {r.generation:0} W" : $"{r.consumption:0} W");
-        dataBar.Set(r.dataGenerated, r.downlink, $"{r.dataGenerated:0} / {r.downlink:0} GB/day");
-        costBar.Set(r.cost, c.budget, $"${r.cost}M / ${c.budget}M");
+        dataBar.Set(r.dataGenerated, r.downlink, $"{r.dataGenerated:0} / {r.downlink:0} GB/day", 1f);
+        costBar.Set(r.cost, c.budget, $"${r.cost}M / ${c.budget}M", 1f);
 
         scienceText.text = $"{r.science}<color={Secondary}>/{c.scienceGoal}</color>";
         scienceText.color = r.science >= c.scienceGoal ? Palette.Green : Palette.Orange;
@@ -77,7 +77,7 @@ public class HangarUI : MonoBehaviour
         alertsText.text = alerts.Length > 0 ? alerts.ToString() : $"<color={Green}>All good. No alerts.</color>";
 
         int left = c.budget - r.cost;
-        fundsText.text = $"${left}M";
+        fundsText.text = left >= 0 ? $"${left}M" : $"-${-left}M";
         fundsText.color = left >= 0 ? Palette.Green : Palette.Orange;
 
         launchButton.interactable = r.CanLaunch;
@@ -129,13 +129,13 @@ public class HangarUI : MonoBehaviour
         var row = UIFactory.Rect("Header", listContent);
         UIFactory.Layout(row.gameObject, 34f);
         var a = UIFactory.Caption("Name", row, title);
-        UIFactory.Place(a.rectTransform, Vector2.zero, Vector2.one, new Vector2(4f, 0f), new Vector2(-170f, 0f));
+        UIFactory.Place(a.rectTransform, Vector2.zero, Vector2.one, new Vector2(4f, 0f), new Vector2(-NameRight, 0f));
         var b = UIFactory.Caption("Col2", row, col2);
         b.alignment = TextAnchor.MiddleRight;
-        UIFactory.Place(b.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-180f, 0f), new Vector2(-70f, 0f));
+        UIFactory.Place(b.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-Col2Left, 0f), new Vector2(-Col2Right, 0f));
         var c = UIFactory.Caption("Col3", row, col3);
         c.alignment = TextAnchor.MiddleRight;
-        UIFactory.Place(c.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-66f, 0f), new Vector2(-16f, 0f));
+        UIFactory.Place(c.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-Col3Left, 0f), new Vector2(-14f, 0f));
     }
 
     void Row(PartSpec part, string col2, string col3)
@@ -154,17 +154,33 @@ public class HangarUI : MonoBehaviour
 
         var row = (RectTransform)button.transform;
         var a = UIFactory.Label("Name", row, name, 24, nameColor, selected ? FontKind.Title : FontKind.Body);
-        UIFactory.Place(a.rectTransform, Vector2.zero, Vector2.one, new Vector2(18f, 0f), new Vector2(-170f, 0f));
+        // Alto de una sola línea (10 px de margen): si no entra, achica la letra en vez de partirla.
+        UIFactory.Place(a.rectTransform, Vector2.zero, Vector2.one, new Vector2(18f, 10f), new Vector2(-NameRight, -10f));
+        FitOneLine(a, 14);
         var b = UIFactory.Label("Col2", row, col2, 24, numberColor, FontKind.Mono, TextAnchor.MiddleRight);
-        UIFactory.Place(b.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-190f, 0f), new Vector2(-70f, 0f));
+        UIFactory.Place(b.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-Col2Left, 10f), new Vector2(-Col2Right, -10f));
+        FitOneLine(b, 15);
         var c = UIFactory.Label("Col3", row, col3, 24, numberColor, FontKind.Mono, TextAnchor.MiddleRight);
-        UIFactory.Place(c.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-66f, 0f), new Vector2(-16f, 0f));
+        UIFactory.Place(c.rectTransform, new Vector2(1f, 0f), Vector2.one, new Vector2(-Col3Left, 0f), new Vector2(-14f, 0f));
 
         button.onClick.AddListener(() =>
         {
             string message = controller.Toggle(part);
             infoText.text = message ?? Describe(part);
         });
+    }
+
+    // Columnas del catálogo (distancias desde el borde derecho de la fila)
+    const float NameRight = 196f, Col2Left = 196f, Col2Right = 62f, Col3Left = 58f;
+
+    // Achica la letra si el texto no entra en una línea (por ejemplo "Lunar orbit (not allowed)").
+    static void FitOneLine(Text t, int minSize)
+    {
+        t.horizontalOverflow = HorizontalWrapMode.Wrap;
+        t.verticalOverflow = VerticalWrapMode.Truncate;
+        t.resizeTextForBestFit = true;
+        t.resizeTextMinSize = minSize;
+        t.resizeTextMaxSize = t.fontSize;
     }
 
     void StationsRow()
