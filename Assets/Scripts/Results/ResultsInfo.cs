@@ -40,6 +40,9 @@ public class ResultsInfo
     public string hungriestInstrument = "Advanced camera"; // el instrumento que más consume
     public float hungriestInstrumentData = 60f;            // GB/día que aporta ese instrumento
 
+    // Diseño completo (piezas), para el trade study. Si es null se usa la solución de referencia.
+    [NonSerialized] public MissionDesign design;
+
     // ----- Resultado (lo completa MissionOutcome.Resolve) -----
     public bool resolved;
     public LaunchEventKind eventKind;

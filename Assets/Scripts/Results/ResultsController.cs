@@ -38,6 +38,14 @@ public class ResultsController : MonoBehaviour
     public Button hubButton;
     public Button redesignButton;
 
+    [Header("Evento y trade study")]
+    public CanvasGroup eventCard;
+    public Text eventTitleText;
+    public Text eventBodyText;
+    public Text riskText;
+    public CanvasGroup tradeCard;
+    public Text tradeText;
+
     [Header("Otros")]
     public Text missionName;
     public Text missionDetail;
@@ -156,6 +164,30 @@ public class ResultsController : MonoBehaviour
         similarName.text = run.similarMission;
         similarNote.text = run.similarMissionNote;
         capcomText.text = run.capcomLine;
+
+        // Evento de la simulación y dado de riesgo
+        eventTitleText.text = run.eventTitle;
+        eventTitleText.color = run.eventHurt ? orange : new Color(0.93f, 0.96f, 1f);
+        eventBodyText.text = run.eventText;
+        riskText.text = "Risk roll: " + run.riskPercent + "%  ·  " + (run.riskFailure
+            ? "<color=#F0782A>FAILED</color>"
+            : "<color=#7BD88F>PASSED</color>");
+
+        // Trade study: el cambio de una sola pieza que habría dado mejor resultado
+        var contract = TestCatalog.Contracts.Find(x => x.title == run.contractTitle) ?? TestCatalog.Contracts[0];
+        tradeText.text = TradeStudy.Best(run.design ?? ReferenceDesign(), contract);
+    }
+
+    // Solución de referencia "Tierra" del README (coincide con los valores por defecto de ResultsInfo).
+    static MissionDesign ReferenceDesign()
+    {
+        var d = new MissionDesign
+        {
+            panel = TestCatalog.Get("panel_l"), battery = TestCatalog.Get("bat"), antenna = TestCatalog.Get("ant_l"),
+            rocket = TestCatalog.Get("chico"), orbit = TestCatalog.Get("leo"), stations = 2,
+        };
+        d.instruments.Add(TestCatalog.Get("cam_a"));
+        return d;
     }
 
     // Verde si sobra 30% o más, amarillo si sobra 10%, rojo si queda menos.
@@ -187,6 +219,8 @@ public class ResultsController : MonoBehaviour
         panelShownX = panel.anchoredPosition.x;
         panel.anchoredPosition = new Vector2(panelShownX + 760f, panel.anchoredPosition.y);
         capcomGroup.alpha = 0f;
+        eventCard.alpha = 0f;
+        tradeCard.alpha = 0f;
 
         bool deploy = run.result != ResultKind.Failed;
         for (float t = 0f; t < 1.4f; t += Time.deltaTime)
@@ -216,12 +250,16 @@ public class ResultsController : MonoBehaviour
             for (int i = 0; i < statFills.Length; i++)
                 statFills[i].anchorMax = new Vector2(statFills[i].GetComponent<StatTarget>().target * k, 1f);
             capcomGroup.alpha = Mathf.Clamp01(t / 0.5f);
+            eventCard.alpha = Mathf.Clamp01(t / 0.4f);
+            tradeCard.alpha = Mathf.Clamp01((t - 0.25f) / 0.4f);
             yield return null;
         }
         SetScience(run.science);
         for (int i = 0; i < statFills.Length; i++)
             statFills[i].anchorMax = new Vector2(statFills[i].GetComponent<StatTarget>().target, 1f);
         capcomGroup.alpha = 1f;
+        eventCard.alpha = 1f;
+        tradeCard.alpha = 1f;
     }
 
     void Update()

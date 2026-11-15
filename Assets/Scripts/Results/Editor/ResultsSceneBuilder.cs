@@ -80,7 +80,7 @@ public static class ResultsSceneBuilder
         orbitCam.target = satellite.transform;
         orbitCam.distance = 12.5f;
         orbitCam.height = 2.6f;
-        orbitCam.frameShift = 3.9f;
+        orbitCam.frameShift = 1.2f; // la nave queda en el hueco entre las tarjetas de la izquierda y el panel
         cam.transform.position = new Vector3(-3.2f, 1.6f, -6.8f);
         cam.transform.LookAt(new Vector3(2.2f, 0f, 1f));
 
@@ -255,6 +255,25 @@ public static class ResultsSceneBuilder
         LaunchHudBuilder.Label("Label", mission, semi, 15, muted, TextAnchor.UpperLeft, "MISSION REPORT", 28f, 0f, 0f, 14f);
         c.missionName = LaunchHudBuilder.Label("MissionName", mission, bold, 28, white, TextAnchor.UpperLeft, "Mission", 28f, 0f, 12f, 34f);
         c.missionDetail = LaunchHudBuilder.Label("MissionDetail", mission, semi, 17, muted, TextAnchor.LowerLeft, "Rocket / Orbit", 28f, 12f, 12f, 0f);
+
+        // ---------- Evento de la simulación y dado de riesgo (izquierda) ----------
+        RectTransform ev = LaunchHudBuilder.Card("EventCard", root, new Vector2(0f, 1f), new Vector2(36f, -164f),
+            new Vector2(460f, 236f), LaunchHudBuilder.Blue);
+        c.eventCard = ev.gameObject.AddComponent<CanvasGroup>();
+        Txt("EventLabel", ev, semi, 15, muted, TextAnchor.UpperLeft, "LAUNCH EVENT", 28f, 18f, 410f, 20f);
+        c.eventTitleText = Txt("EventTitle", ev, bold, 28, white, TextAnchor.UpperLeft, "", 28f, 42f, 410f, 36f);
+        c.eventBodyText = Txt("EventBody", ev, semi, 20, muted, TextAnchor.UpperLeft, "", 28f, 82f, 410f, 100f);
+        BestFit(c.eventBodyText, 15, 20);
+        c.riskText = Txt("RiskRoll", ev, mono, 21, white, TextAnchor.UpperLeft, "", 28f, 192f, 410f, 28f);
+        c.riskText.supportRichText = true;
+
+        // ---------- Trade study (izquierda) ----------
+        RectTransform trade = LaunchHudBuilder.Card("TradeCard", root, new Vector2(0f, 1f), new Vector2(36f, -420f),
+            new Vector2(460f, 170f), green);
+        c.tradeCard = trade.gameObject.AddComponent<CanvasGroup>();
+        Txt("TradeLabel", trade, semi, 15, muted, TextAnchor.UpperLeft, "WITH A DIFFERENT CHOICE", 28f, 18f, 410f, 20f);
+        c.tradeText = Txt("TradeText", trade, semi, 22, white, TextAnchor.UpperLeft, "", 28f, 46f, 410f, 106f);
+        BestFit(c.tradeText, 16, 22);
 
         // ---------- CAPCOM (abajo a la izquierda) ----------
         RectTransform capcom = LaunchHudBuilder.Card("CapcomBar", root, new Vector2(0f, 0f), new Vector2(36f, 56f),
