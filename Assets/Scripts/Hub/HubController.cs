@@ -162,14 +162,7 @@ public class HubController : MonoBehaviour
                 else GameShell.Load(hangarScene);
                 break;
             case BuildingKind.LaunchPad:
-                // Los cohetes salen de acá, pero el satélite se arma y se lanza desde el hangar.
-                if (string.IsNullOrEmpty(AcceptedContractId))
-                {
-                    GameShell.Play(Sfx.Deny);
-                    Toast("Rockets launch from here. First pick a contract at Mission Control.");
-                }
-                else GameShell.Load(hangarScene);
-                break;
+                break; // Decorative only; assembly and launch start in the hangar.
             case BuildingKind.Antennas:
                 toast.SetActive(false);
                 stationsPanel.Open();

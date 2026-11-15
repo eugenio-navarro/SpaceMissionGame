@@ -84,21 +84,12 @@ public class MainMenu : MonoBehaviour
 
         var caption = UIFactory.Label("Event", column, "NASA SPACE APPS CHALLENGE 2026", 19, Palette.Blue, FontKind.Body);
         UIFactory.Layout(caption.gameObject, 28f);
-<<<<<<< HEAD
         var t1 = UIFactory.Label("Title1", column, "MISSION CONTROL:", 54, Palette.TextMain, FontKind.Title);
         t1.horizontalOverflow = HorizontalWrapMode.Overflow;
         UIFactory.Layout(t1.gameObject, 64f);
         var t2 = UIFactory.Label("Title2", column, "BUILD TO LAUNCH", 56, Palette.Orange, FontKind.Title);
         t2.horizontalOverflow = HorizontalWrapMode.Overflow;
         UIFactory.Layout(t2.gameObject, 66f);
-=======
-        var t1 = UIFactory.Label("Title1", column, "MISSION CONTROL:", 62, Palette.TextMain, FontKind.Title);
-        t1.horizontalOverflow = HorizontalWrapMode.Overflow;
-        UIFactory.Layout(t1.gameObject, 66f);
-        var t2 = UIFactory.Label("Title2", column, "BUILD TO LAUNCH", 78, Palette.Orange, FontKind.Title);
-        t2.horizontalOverflow = HorizontalWrapMode.Overflow;
-        UIFactory.Layout(t2.gameObject, 86f);
->>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a
         var tag = UIFactory.Label("Tagline", column, "Plan a satellite. Build it. Launch it.\nFind out why it worked.", 22, Palette.TextSecondary, FontKind.Body);
         UIFactory.Layout(tag.gameObject, 64f);
         UIFactory.Layout(UIFactory.Rect("Gap", column).gameObject, 6f);

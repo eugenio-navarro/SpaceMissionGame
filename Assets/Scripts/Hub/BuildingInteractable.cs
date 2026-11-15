@@ -27,13 +27,14 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
 
     void Awake()
     {
+        if (kind == BuildingKind.LaunchPad) { enabled = false; return; }
         baseScale = transform.localScale;
         hub = FindAnyObjectByType<HubController>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (hub != null && hub.Busy) return;
+        if (kind == BuildingKind.LaunchPad || (hub != null && hub.Busy)) return;
         hovered = true;
         transform.localScale = baseScale * hoverScale;
         GameShell.SetPointer(true);
@@ -43,6 +44,7 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (kind == BuildingKind.LaunchPad) return;
         hovered = false;
         transform.localScale = baseScale;
         GameShell.SetPointer(false);
@@ -52,6 +54,7 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left) return;
+        if (kind == BuildingKind.LaunchPad) return;
         hovered = false;
         transform.localScale = baseScale;
         GameShell.SetPointer(false);

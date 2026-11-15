@@ -7,11 +7,7 @@ using UnityEngine.UI;
 // menú de pausa y opciones, créditos y pantalla de título.
 public static class ShellScreens
 {
-<<<<<<< HEAD
     const string GameTitle = UILayout.GameTitle;
-=======
-    const string GameTitle = "MISSION CONTROL: BUILD TO LAUNCH";
->>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a
 
     // ---------- Menú de pausa / opciones ----------
 

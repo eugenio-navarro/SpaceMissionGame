@@ -84,7 +84,7 @@ public static class HubSceneBuilder
             var piece = Model(part, SpaceKit + part, rocket, new Vector3(0f, y, 0f), 2.2f);
             y += Height(piece);
         }
-        Interactable(padArea.gameObject, BuildingKind.LaunchPad, "Launch Pad");
+        // Launch pad remains decorative; Assembly Hangar is the only assembly entry.
 
         Model("Tank_A", CityKit + "detail-tank-large", decor, new Vector3(-25f, 0f, 18f), 3f);
         Model("Tank_B", CityKit + "detail-tank-large", decor, new Vector3(-20f, 0f, 25f), 3f, 90f);

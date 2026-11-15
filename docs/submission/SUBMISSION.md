@@ -14,7 +14,7 @@ Mission Control: Build to Launch is a free 3D browser game where players design 
 
 Official project video supplied by the team: [MissionControl_Demo.mp4](MissionControl_Demo.mp4).
 
-Duration: **29.4 seconds**. Resolution: **1920 x 1080**. The video includes an audio track. The file is an unchanged copy of the supplied recording.
+Duration: **29.4 seconds**. Resolution: **1920 x 1080**. The video includes an audio track. The edit preserves the original audio and most footage, replacing menu/title shots and adding Mission Forecast footage captured with Unity Recorder.
 
 Use this public URL in Project Demonstration after pushing the files to GitHub:
 
@@ -116,7 +116,7 @@ These appear as 'Learn more' in ShellScreens.cs. They are not inputs to the game
 - [x] Playable WebGL release published on itch.io and menu verified during publication.
 - [x] Public project summary, details, sources and AI disclosure prepared here.
 - [x] Current player-focused README prepared.
-- [x] Official project video included unchanged; duration verified at 29.4 seconds, resolution 1920 x 1080.
+- [x] Updated project video included; duration verified at 29.4 seconds, resolution 1920 x 1080.
 - [ ] Review video language, captions and credits before submission.
 - [ ] Commit and push these files to the public repository. Confirm the commit is present remotely.
 - [ ] Confirm the official video and all project links open without authentication.
