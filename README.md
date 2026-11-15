@@ -1,4 +1,15 @@
-# Space Mission Design Game
+# Mission Control: Build to Launch
+
+> **For judges (English summary)**
+>
+> **Mission Control: Build to Launch** is a browser game for the NASA Space Apps Challenge 2026 challenge "Space Mission Design Game", made by team **Hell0 World!** (Buenos Aires).
+>
+> - **Play it:** ITCH_URL (runs in the browser, no install).
+> - **How to play:** pick a contract at Mission Control (Landsat, Hubble or LRO-style missions), build a satellite in the Assembly Hangar (instruments, power, rocket and orbit, comms), review the equipment list (MEL) and launch. Results explain *why* the mission worked or failed, compare it with a real mission (Landsat 9, Hubble, LRO or Argentina's SAOCOM) and suggest one change to try. Every flight is saved in the Mission Archive with what went well, what went wrong and the lesson.
+> - **For every level:** step-by-step tutorial, a Mission Guide with the key concepts, three difficulty levels (Cadet, Engineer, Flight Director) and a Free Mode sandbox.
+> - **Controls:** mouse. Esc: menu. Space: separate the rocket stage. Enter: skip the launch.
+> - **Built with NASA resources:** Design and Develop Science Missions, Goddard Mission Design Lab, Build It Yourself: Satellite!, CubeSat 101 and the real mission pages. Full list in [`REFERENCES.md`](REFERENCES.md). Game numbers are simplified for learning.
+> - **AI use:** Claude (Anthropic) assisted with research, design, code and text; the team reviewed every change. Details in [`REFERENCES.md`](REFERENCES.md#herramientas-de-ia).
 
 Juego 3D en Unity para el **NASA Space Apps Challenge 2026**, challenge **"Space Mission Design Game"**.
 
@@ -442,7 +453,7 @@ Detalle completo en **`REFERENCES.md`**: hay que anotar cada asset al bajarlo.
 - [ ] Link al repo de GitHub (público o con acceso para los jueces)
 - [ ] Video demo corto, con subtítulos en inglés si está en español
 - [ ] *References* completo (copiar de `REFERENCES.md`)
-- [ ] Uso de IA declarado
+- [x] Uso de IA declarado (README y REFERENCES.md)
 - [ ] Casillas de confirmación marcadas
 - [ ] Entregado **antes de las 15:00 del domingo** (presentación al jurado del evento BA) y siempre antes de las 23:59
 
@@ -471,7 +482,7 @@ Detalle completo en **`REFERENCES.md`**: hay que anotar cada asset al bajarlo.
 ## 13. Pendientes y decisiones abiertas
 
 - [x] Nombre del equipo: **Hell0 World!**
-- [x] Nombre del juego: **Space Mission Design**
+- [x] Nombre del juego: **Mission Control: Build to Launch**
 - [x] Modalidad: virtual (el domingo es todo por Discord; trabajo hasta las 15:00 y después presentaciones)
 - [ ] Confirmar con el organizador de BA el horario exacto de entrega y presentación
 - [ ] Diseño y nombre del personaje CAPCOM
