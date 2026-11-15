@@ -91,7 +91,6 @@ Generados por código en el juego (`Assets/Scripts/Core/SoundBank.cs`): no se us
 - Textures by **Solar System Scope** — https://www.solarsystemscope.com/textures/ — licensed under CC BY 4.0.
 - 3D assets by **Kenney** (www.kenney.nl) — CC0.
 
-<<<<<<< HEAD
 ## Mission Control: Build to Launch events
 
 - NASA radar through clouds https://svs.gsfc.nasa.gov/5661
@@ -99,8 +98,7 @@ Generados por código en el juego (`Assets/Scripts/Core/SoundBank.cs`): no se us
 - NASA storm atmospheric drag https://svs.gsfc.nasa.gov/5193/
 
 Probabilities, loss fractions and equipment statistics are simplified game values. The storm power rule is an abstraction; the historical Starlink case involved atmospheric drag.
-=======
+
 ## Publication and delivery assistance
 
 - **ChatGPT (OpenAI):** itch.io publication configuration, responsive WebGL HTML/CSS wrapper, repository documentation, submission text. The official project demonstration is the team-supplied MissionControl_Demo.mp4 (29.4 seconds, 1920 x 1080), updated with menu and Mission Forecast footage captured in Unity Recorder. ChatGPT assisted with recording and editing these replacements; the original audio and most footage were preserved. Its language and content credits require team review before submission.
->>>>>>> 67306400d0ec165baa68b4130621682b16d4ae8a
