@@ -16,7 +16,7 @@ public class GameShell : MonoBehaviour
     public static Func<bool> SceneEscape;
 
     public const string HubScene = "CentroEspacial";
-    static bool titleShown;
+    public const string MenuScene = "MenuPrincipal";
 
     RectTransform tutorialLayer, titleLayer, menuLayer, creditsLayer;
     Image fade;
@@ -181,6 +181,7 @@ public class GameShell : MonoBehaviour
     }
 
     public void OpenMenu() => OpenMenu(false);
+    public void OpenOptions() => OpenMenu(true); // desde el menú principal: solo opciones
 
     void OpenMenu(bool fromTitle)
     {
@@ -215,6 +216,13 @@ public class GameShell : MonoBehaviour
     public void OpenCredits() => ShellScreens.BuildCredits(this, creditsLayer);
     public void CloseCredits() => Clear(creditsLayer);
 
+    public void ToMainMenu()
+    {
+        CloseMenu();
+        ResultsContext.Clear();
+        Load(MenuScene);
+    }
+
     public void ToSpaceCenter()
     {
         CloseMenu();
@@ -231,31 +239,15 @@ public class GameShell : MonoBehaviour
 #endif
     }
 
-    // ---------- Pantalla de título (solo la primera vez que se entra al Centro Espacial) ----------
-
-    // Muestra el título si todavía no se mostró en esta sesión. Llama a onPlay cuando el jugador entra.
-    public static bool ShowTitleOnce(Action onPlay)
-    {
-        if (Instance == null || titleShown) return false;
-        titleShown = true;
-        ShellScreens.BuildTitle(Instance, Instance.titleLayer, () =>
-        {
-            Clear(Instance.titleLayer);
-            Play(Sfx.Whoosh);
-            onPlay?.Invoke();
-        }, () => Instance.OpenMenu(true));
-        return true;
-    }
-
     // ---------- Tutorial ----------
 
     // Tarjeta de pasos abajo al centro. Se marca como vista al terminarla o saltearla.
-    public static void Tutorial(string key, string[] steps, float bottom, float width, Func<bool> hideWhen = null)
+    public static void Tutorial(string key, TutorialStep[] steps, float bottom, float width, Func<bool> hideWhen = null, Action onFinish = null)
     {
         if (Instance == null || SaveData.Seen(key)) return;
         Clear(Instance.tutorialLayer);
         var coach = UIFactory.Rect("Tutorial", Instance.tutorialLayer).gameObject.AddComponent<TutorialCoach>();
-        coach.Setup(key, steps, bottom, width, hideWhen);
+        coach.Setup(key, steps, bottom, width, hideWhen, onFinish);
     }
 
     // ---------- Cursor ----------

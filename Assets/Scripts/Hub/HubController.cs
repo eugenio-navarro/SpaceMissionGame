@@ -35,7 +35,6 @@ public class HubController : MonoBehaviour
     float toastUntil;
     CanvasGroup toastGroup;
     Canvas canvas;
-    bool titleOpen;
     StationsPanel stationsPanel;
     ArchivePanel archivePanel;
 
@@ -43,7 +42,7 @@ public class HubController : MonoBehaviour
         || stationsPanel.gameObject.activeSelf || archivePanel.gameObject.activeSelf;
 
     // Mientras hay un panel, el título o la pausa, los edificios no responden.
-    public bool Busy => AnyPanelOpen || titleOpen || (GameShell.Instance != null && GameShell.Instance.MenuOpen);
+    public bool Busy => AnyPanelOpen || (GameShell.Instance != null && GameShell.Instance.MenuOpen);
 
     void Start()
     {
@@ -59,28 +58,36 @@ public class HubController : MonoBehaviour
         if (menuButton != null && GameShell.Instance != null) menuButton.onClick.AddListener(GameShell.Instance.OpenMenu);
         GameShell.SceneEscape = HandleEscape;
 
-        // La primera vez de la sesión se ve el título encima del centro espacial.
-        titleOpen = GameShell.ShowTitleOnce(Enter);
-        if (titleOpen) canvas.enabled = false;
-        else Enter();
+        StartTutorial();
     }
 
     void OnDestroy()
     {
         if (GameShell.SceneEscape == HandleEscape) GameShell.SceneEscape = null;
+        BuildingInteractable.Highlighted = null;
     }
 
-    void Enter()
+    // Tutorial guiado: cada paso espera a que el jugador haga lo que se pide y resalta el edificio.
+    void StartTutorial()
     {
-        titleOpen = false;
-        canvas.enabled = true;
-        RefreshStatus();
+        bool Accepted() => !string.IsNullOrEmpty(AcceptedContractId);
+        // Mientras guía el tutorial, se esconde el cartel genérico de abajo (queda en el mismo lugar).
+        var hintCard = canvas.transform.Find("HintCard");
+        if (hintCard != null) hintCard.gameObject.SetActive(SaveData.Seen("tut_hub"));
         GameShell.Tutorial("tut_hub", new[]
         {
-            "Welcome, mission designer! Your job: plan a satellite mission that brings science back to Earth.",
-            "Click <b>Mission Control</b> to pick a contract. Each one has a science goal and a budget.",
-            "Then click the <b>Assembly Hangar</b> to build your satellite and launch it.",
-        }, UIFactory.Margin + 172f, 720f, () => Busy);
+            new TutorialStep("Welcome, mission designer! This is your space center. Your job: plan a satellite mission that brings science back to Earth."),
+            new TutorialStep("First you need a mission. Click <b>Mission Control</b>: the building that is pulsing.",
+                () => contractsPanel.activeSelf || Accepted(),
+                () => BuildingInteractable.Highlighted = BuildingKind.MissionControl),
+            new TutorialStep("Each contract has a <b>science goal</b> to reach and a <b>budget</b> you can't go over. Press <b>ACCEPT</b> on \"Observe the Earth\".",
+                Accepted,
+                () => BuildingInteractable.Highlighted = Accepted() ? (BuildingKind?)null : BuildingKind.MissionControl),
+            new TutorialStep("Contract accepted! Now click the <b>Assembly Hangar</b> (the big pulsing building) to build your satellite.",
+                () => false, // termina al cambiar de escena
+                () => { BuildingInteractable.Highlighted = BuildingKind.Hangar; SaveData.MarkSeen("tut_hub"); }),
+        }, 4f, 1000f, () => GameShell.Instance != null && GameShell.Instance.MenuOpen || stationsPanel.gameObject.activeSelf || archivePanel.gameObject.activeSelf,
+        () => { BuildingInteractable.Highlighted = null; if (hintCard != null) hintCard.gameObject.SetActive(true); });
     }
 
     // Esc cierra el panel abierto; si no hay ninguno, deja que se abra la pausa.
@@ -191,10 +198,7 @@ public class HubController : MonoBehaviour
 
     public void ToggleFreeMode()
     {
-        FreeMode.On = !FreeMode.On;
-        // Al volver a la campaña, un contrato todavía bloqueado deja de estar aceptado.
-        if (!FreeMode.On && !string.IsNullOrEmpty(AcceptedContractId) && !Campaign.IsUnlocked(TestCatalog.Contract(AcceptedContractId)))
-            AcceptedContractId = "";
+        FreeMode.Toggle();
         RefreshContracts();
         RefreshStatus();
     }

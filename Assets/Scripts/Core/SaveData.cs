@@ -123,6 +123,17 @@ public static class SaveData
     public static bool Seen(string key) => PlayerPrefs.GetInt("seen_" + key, 0) == 1;
     public static void MarkSeen(string key) { PlayerPrefs.SetInt("seen_" + key, 1); PlayerPrefs.Save(); }
 
+    // Tutorial encendido = todavía queda alguna guía por mostrar. Se prende y apaga desde el menú principal.
+    public static bool TutorialOn
+    {
+        get => !Seen("tut_hub") || !Seen("tut_hangar");
+        set
+        {
+            if (value) ResetTutorials();
+            else { MarkSeen("tut_hub"); MarkSeen("tut_hangar"); }
+        }
+    }
+
     public static void ResetTutorials()
     {
         PlayerPrefs.DeleteKey("seen_tut_hub");

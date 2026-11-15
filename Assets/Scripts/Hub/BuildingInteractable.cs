@@ -10,8 +10,20 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
     public string displayName;
     public float hoverScale = 1.06f;
 
+    // Edificio que el tutorial quiere que el jugador clickee: late para llamar la atención.
+    public static BuildingKind? Highlighted;
+
     Vector3 baseScale;
     HubController hub;
+    bool hovered;
+
+    void Update()
+    {
+        if (hovered) return;
+        bool pulse = Highlighted == kind && (hub == null || !hub.Busy);
+        float k = pulse ? 1f + 0.07f * (0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 6f)) : 1f;
+        transform.localScale = baseScale * k;
+    }
 
     void Awake()
     {
@@ -22,6 +34,7 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (hub != null && hub.Busy) return;
+        hovered = true;
         transform.localScale = baseScale * hoverScale;
         GameShell.SetPointer(true);
         GameShell.Play(Sfx.Hover);
@@ -30,6 +43,7 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        hovered = false;
         transform.localScale = baseScale;
         GameShell.SetPointer(false);
         if (hub != null) hub.HideTooltip();
@@ -38,6 +52,7 @@ public class BuildingInteractable : MonoBehaviour, IPointerEnterHandler, IPointe
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left) return;
+        hovered = false;
         transform.localScale = baseScale;
         GameShell.SetPointer(false);
         if (hub == null || hub.Busy) return;

@@ -53,12 +53,26 @@ public class HangarUI : MonoBehaviour
         Refresh();
         BuildGuideButton();
 
+        StartTutorial();
+    }
+
+    // Tutorial guiado: abre cada pestaña y espera a que el jugador elija la pieza que se pide.
+    void StartTutorial()
+    {
+        var d = controller.Design;
         GameShell.Tutorial("tut_hangar", new[]
         {
-            "Build your satellite with the four tabs on the left: <b>Science</b>, <b>Power</b>, <b>Rocket</b> and <b>Comms</b>.",
-            "The bars on the right compare what you use against what you have. <color=#7BD88F>Green</color> is fine, <color=#F0782A>orange</color> means trouble.",
-            "Reach the science goal without going over budget. When there are no red X alerts, press <b>LAUNCH</b>!",
-        }, UIFactory.Margin, 500f);
+            new TutorialStep("This is the hangar. You build the satellite with the 4 tabs on the left. <b>Hover</b> a part to read what it does, <b>click</b> to add or remove it."),
+            new TutorialStep("<b>SCIENCE</b> tab: add an instrument. Instruments make the data that becomes your science score.",
+                () => d.instruments.Count > 0, () => ShowTab(0)),
+            new TutorialStep("<b>POWER</b> tab: add a solar panel. It must make more watts than your parts use (see the POWER bar).",
+                () => d.panel != null, () => ShowTab(1)),
+            new TutorialStep("<b>ROCKET</b> tab: pick a rocket and an orbit. The rocket must lift your satellite's mass (see the MASS bar).",
+                () => d.rocket != null && d.orbit != null, () => ShowTab(2)),
+            new TutorialStep("<b>COMMS</b> tab: pick an antenna. It sends your data to Earth: watch the DATA bar and add ground stations if data is lost.",
+                () => d.antenna != null, () => ShowTab(3)),
+            new TutorialStep("Now read <b>ALERTS</b> on the right. An <color=#F0782A>X</color> must be fixed. Reach the science goal, then press <b>LAUNCH</b> to review and fly!"),
+        }, UIFactory.Margin, 500f, () => review != null && review.IsOpen);
     }
 
     // Botón visible para abrir la guía de conceptos (también está en el menú de Esc).

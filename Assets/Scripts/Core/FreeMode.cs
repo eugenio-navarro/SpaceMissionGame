@@ -9,4 +9,13 @@ public static class FreeMode
         get => PlayerPrefs.GetInt("free_mode", 0) == 1;
         set { PlayerPrefs.SetInt("free_mode", value ? 1 : 0); PlayerPrefs.Save(); }
     }
+
+    // Cambia el modo. Al volver a la campaña, un contrato todavía bloqueado deja de estar aceptado.
+    public static void Toggle()
+    {
+        On = !On;
+        string accepted = SaveData.AcceptedContract;
+        if (!On && !string.IsNullOrEmpty(accepted) && !Campaign.IsUnlocked(TestCatalog.Contract(accepted)))
+            SaveData.AcceptedContract = "";
+    }
 }

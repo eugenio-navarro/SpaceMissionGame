@@ -34,12 +34,13 @@ public static class ShellScreens
         tutorial = Button(window, "REPLAY TUTORIAL", () =>
         {
             SaveData.ResetTutorials();
-            tutorial.GetComponentInChildren<Text>().text = "TUTORIAL WILL SHOW AGAIN";
+            tutorial.GetComponentInChildren<Text>().text = "TUTORIAL ON: STARTS IN THE SPACE CENTER";
         });
 
         Button(window, "MISSION GUIDE", shell.OpenGuide);
         Button(window, "CREDITS", shell.OpenCredits);
         if (!fromTitle && !inHub) Button(window, "SPACE CENTER", shell.ToSpaceCenter);
+        if (!fromTitle) Button(window, "MAIN MENU", shell.ToMainMenu);
 #if !UNITY_WEBGL
         Button(window, "QUIT GAME", shell.Quit, Palette.TextSecondary);
 #endif
@@ -168,52 +169,6 @@ public static class ShellScreens
         var c = UIFactory.Caption("Caption", box, caption);
         UIFactory.Layout(c.gameObject, 22f);
         UIFactory.Label("Text", box, text, 21, Palette.TextMain, FontKind.Body); // alto según las líneas que ocupe
-    }
-
-    // ---------- Título ----------
-
-    public static void BuildTitle(GameShell shell, RectTransform layer, Action onPlay, Action onOptions)
-    {
-        var dim = UIFactory.Image("Dim", layer, null, new Color(0.02f, 0.03f, 0.06f, 0.72f), true); // la UI mezcla en espacio lineal: hace falta más alfa
-        UIFactory.Stretch(dim.rectTransform);
-        var root = dim.rectTransform;
-
-        var column = UIFactory.Rect("Column", root);
-        UIFactory.Pin(column, new Vector2(0.5f, 0.5f), new Vector2(0f, 10f), new Vector2(1400f, 760f));
-        UIFactory.Vertical(column.gameObject, 0, 0, 0, 0, 14f).childAlignment = TextAnchor.UpperCenter;
-        UIFactory.Appear(column.gameObject);
-
-        var caption = UIFactory.Label("Event", column, "NASA SPACE APPS CHALLENGE 2026", 22, Palette.Blue, FontKind.Body, TextAnchor.MiddleCenter);
-        UIFactory.Layout(caption.gameObject, 34f);
-
-        var title = UIFactory.Label("Title", column, $"SPACE MISSION <color={Palette.Tag(Palette.Orange)}>DESIGN</color>", 92, Palette.TextMain, FontKind.Title, TextAnchor.MiddleCenter);
-        title.horizontalOverflow = HorizontalWrapMode.Overflow;
-        UIFactory.Layout(title.gameObject, 120f);
-
-        var sub = UIFactory.Label("Subtitle", column, "Plan a satellite. Build it. Launch it. Find out why it worked.", 28, Palette.TextSecondary, FontKind.Body, TextAnchor.MiddleCenter);
-        UIFactory.Layout(sub.gameObject, 60f);
-
-        var buttons = UIFactory.Rect("Buttons", column);
-        var v = UIFactory.Vertical(buttons.gameObject, 490, 490, 20, 0, 14f);
-        v.childAlignment = TextAnchor.UpperCenter;
-        UIFactory.Layout(buttons.gameObject, 440f);
-
-        bool progress = SaveData.HasProgress;
-        Button(buttons, progress ? "CONTINUE" : "PLAY", onPlay, null, 72f, 34);
-        if (progress)
-        {
-            Button(buttons, "NEW GAME", () =>
-            {
-                SaveData.NewGame();
-                onPlay();
-            });
-        }
-        Button(buttons, "HOW TO PLAY", shell.OpenGuide);
-        Button(buttons, "OPTIONS", onOptions);
-        Button(buttons, "CREDITS", shell.OpenCredits);
-#if !UNITY_WEBGL
-        Button(buttons, "QUIT", shell.Quit, Palette.TextSecondary);
-#endif
     }
 
     // ---------- Piezas comunes ----------
