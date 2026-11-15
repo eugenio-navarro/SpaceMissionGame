@@ -59,6 +59,7 @@ public class HubController : MonoBehaviour
         GameShell.SceneEscape = HandleEscape;
 
         StartTutorial();
+        AnnounceNewFlight();
 
         // Si ya hizo el tutorial pero entra por primera vez en Modo Libre, se le explica el modo.
         if (FreeMode.On && SaveData.Seen("tut_hub") && !SaveData.Seen("tut_free"))
@@ -69,6 +70,17 @@ public class HubController : MonoBehaviour
     {
         if (GameShell.SceneEscape == HandleEscape) GameShell.SceneEscape = null;
         BuildingInteractable.Highlighted = null;
+    }
+
+    // Si hay vuelos nuevos en la bitácora, invita a revisarlos: la cúpula late hasta que se abre.
+    void AnnounceNewFlight()
+    {
+        int count = FlightLog.All().Count;
+        if (count <= PlayerPrefs.GetInt("log_seen", 0)) return;
+        if (!SaveData.Seen("tut_hub")) return; // durante el tutorial no se distrae
+        BuildingInteractable.Highlighted = BuildingKind.Dome;
+        Toast("Flight saved! Open the Mission Archive (the pulsing glass dome) to see what went well and what to fix.");
+        toastUntil = Time.unscaledTime + 6f;
     }
 
     // Explica de qué se trata el modo en el que está jugando.
@@ -164,6 +176,8 @@ public class HubController : MonoBehaviour
                 break;
             case BuildingKind.Dome:
                 toast.SetActive(false);
+                PlayerPrefs.SetInt("log_seen", FlightLog.All().Count);
+                if (BuildingInteractable.Highlighted == BuildingKind.Dome) BuildingInteractable.Highlighted = null;
                 archivePanel.Open();
                 break;
         }

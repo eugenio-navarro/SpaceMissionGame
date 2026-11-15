@@ -82,6 +82,7 @@ public class ResultsController : MonoBehaviour
         SetupWorld();
         FillPanel();
         if (!ResultsContext.IsTestData && !FreeMode.On) RecordAndCheckUnlock(); // el Modo Libre no cuenta para la campaña
+        if (!ResultsContext.IsTestData) FlightLog.Record(run, SaveData.Score(run.science, run.budget, run.cost)); // la bitácora guarda todos
 
         hubButton.onClick.AddListener(() => Leave(hubScene, true));
         redesignButton.onClick.AddListener(() => Leave(hangarScene, false));
@@ -326,7 +327,7 @@ public class ResultsController : MonoBehaviour
 
     string ScoreLine() =>
         $"Score = science x 10 + money left: {run.science} x 10 + ${Mathf.Max(0, run.budget - run.cost)}M = {score}. " +
-        "See the ranking in the Mission Archive.";
+        "See the full flight analysis in the Mission Archive.";
 
     void Update()
     {

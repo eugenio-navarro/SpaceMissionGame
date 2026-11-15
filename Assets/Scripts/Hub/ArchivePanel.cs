@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-// Cúpula: archivo de misiones. Por cada contrato muestra si está bloqueado, el mejor resultado,
-// la ciencia lograda contra la meta y el detalle del último vuelo.
+// Cúpula: archivo de misiones. Pestaña CONTRACTS: por cada contrato, estado, mejor resultado, ciencia
+// contra la meta, último vuelo y ranking. Pestaña FLIGHT LOG: cada vuelo con qué salió bien, qué salió mal
+// y la lección, para que el jugador aprenda de sus intentos.
 public class ArchivePanel : MonoBehaviour
 {
     class Row
@@ -14,6 +15,10 @@ public class ArchivePanel : MonoBehaviour
 
     Row[] rows;
     Text summary, unlocks;
+    RectTransform contractsView, logView, logList;
+    Text logDetail;
+    Button contractsTab, logTab;
+    int selected = -1;
 
     public static ArchivePanel Create(Transform canvasRoot, HubController hub)
     {
@@ -29,7 +34,80 @@ public class ArchivePanel : MonoBehaviour
     {
         gameObject.SetActive(true);
         Refresh();
+        // Si hay vuelos, se abre directo en la bitácora con el último vuelo elegido.
+        ShowLog(FlightLog.All().Count > 0);
     }
+
+    void ShowLog(bool log)
+    {
+        contractsView.gameObject.SetActive(!log);
+        logView.gameObject.SetActive(log);
+        contractsTab.GetComponent<CardButtonFx>().SetActive(!log);
+        logTab.GetComponent<CardButtonFx>().SetActive(log);
+        if (log) RefreshLog(-1);
+    }
+
+    // ---------- Bitácora ----------
+
+    void RefreshLog(int pick)
+    {
+        foreach (Transform child in logList) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
+        var flights = FlightLog.All();
+        logTab.GetComponentInChildren<Text>().text = $"FLIGHT LOG ({flights.Count})";
+
+        if (flights.Count == 0)
+        {
+            logDetail.text = "<b>No flights yet.</b>\n\nLaunch your first satellite. Every flight is saved here with what went well, what went wrong and what to try next, so you can learn from each attempt.";
+            return;
+        }
+
+        // Los más nuevos primero (se ven los últimos 9)
+        int shown = Mathf.Min(9, flights.Count);
+        if (pick < 0) pick = flights.Count - 1;
+        selected = pick;
+        for (int k = 0; k < shown; k++)
+        {
+            int index = flights.Count - 1 - k;
+            var f = flights[index];
+            string result = ResultName(f.Result);
+            var b = UIFactory.ButtonCard("Flight", logList, "", 18, null, null, false);
+            UIFactory.Layout(b.gameObject, 52f);
+            b.GetComponent<CardButtonFx>().SetActive(index == selected);
+            var label = b.GetComponentInChildren<Text>();
+            label.alignment = TextAnchor.MiddleLeft;
+            label.rectTransform.offsetMin = new Vector2(18f, 4f);
+            label.text = $"<color={Palette.Tag(Palette.TextSecondary)}>#{f.number}</color>  {f.contract}   " +
+                         $"<color={Palette.Tag(ResultColor(f.Result))}>{result} {f.science}/{f.goal}</color>";
+            label.color = Palette.TextMain;
+            b.GetComponent<CardButtonFx>().labelColor = Palette.TextMain;
+            b.onClick.AddListener(() => RefreshLog(index));
+        }
+
+        logDetail.text = Analysis(flights[selected]);
+    }
+
+    static string Analysis(FlightRecord f)
+    {
+        string green = Palette.Tag(Palette.Green), orange = Palette.Tag(Palette.Orange), grey = Palette.Tag(Palette.TextSecondary);
+        var sb = new System.Text.StringBuilder();
+        sb.Append($"<size=30><b>Flight #{f.number}: {f.contract}</b></size>\n");
+        sb.Append($"<color={Palette.Tag(ResultColor(f.Result))}><b>{ResultName(f.Result)}</b> · {f.science} of {f.goal} science · score {f.score}</color>\n");
+        sb.Append($"<color={grey}>{f.mode} · {f.level} · {f.rocket} · {f.orbit} · {f.stations} station{(f.stations == 1 ? "" : "s")} · ${f.cost}M\n{f.parts}</color>\n\n");
+
+        var well = FlightLog.WentWell(f);
+        var wrong = FlightLog.WentWrong(f);
+        sb.Append($"<color={green}><b>WHAT WENT WELL</b></color>\n");
+        if (well.Count == 0) sb.Append($"<color={grey}>Nothing stood out this time.</color>\n");
+        foreach (var line in well) sb.Append($"<color={green}>+</color> {line}\n");
+        sb.Append($"\n<color={orange}><b>WHAT WENT WRONG</b></color>\n");
+        if (wrong.Count == 0) sb.Append($"<color={grey}>Nothing. A clean flight!</color>\n");
+        foreach (var line in wrong) sb.Append($"<color={orange}>-</color> {line}\n");
+        sb.Append($"\n<b>LESSON FOR NEXT TIME</b>\n{f.tryNext}");
+        return sb.ToString();
+    }
+
+    static string ResultName(ResultKind r) => r == ResultKind.Success ? "SUCCESS" : r == ResultKind.Partial ? "PARTIAL" : "FAILED";
+    static Color ResultColor(ResultKind r) => r == ResultKind.Success ? Palette.Green : Palette.Orange;
 
     void Refresh()
     {
@@ -84,7 +162,21 @@ public class ArchivePanel : MonoBehaviour
     void Build(RectTransform window)
     {
         summary = UIFactory.Label("Summary", window, "", 18, Palette.TextSecondary, FontKind.Body, TextAnchor.MiddleRight);
-        UIFactory.Place(summary.rectTransform, new Vector2(0f, 1f), Vector2.one, new Vector2(36f, -100f), new Vector2(-100f, -62f));
+        UIFactory.Place(summary.rectTransform, new Vector2(0f, 1f), Vector2.one, new Vector2(36f, -112f), new Vector2(-100f, -84f));
+
+        // Pestañas
+        logTab = UIFactory.ButtonCard("LogTab", window, "FLIGHT LOG", 20, null, null, false);
+        UIFactory.Pin((RectTransform)logTab.transform, Vector2.one, new Vector2(-92f, -20f), new Vector2(240f, 52f));
+        logTab.onClick.AddListener(() => ShowLog(true));
+        contractsTab = UIFactory.ButtonCard("ContractsTab", window, "CONTRACTS", 20, null, null, false);
+        UIFactory.Pin((RectTransform)contractsTab.transform, Vector2.one, new Vector2(-92f - 252f, -20f), new Vector2(200f, 52f));
+        contractsTab.onClick.AddListener(() => ShowLog(false));
+
+        BuildLog(window);
+
+        contractsView = UIFactory.Rect("ContractsView", window);
+        UIFactory.Stretch(contractsView);
+        window = contractsView;
 
         var list = UIFactory.Rect("List", window);
         UIFactory.Place(list, Vector2.zero, Vector2.one, new Vector2(36f, 84f), new Vector2(-36f, -128f));
@@ -96,6 +188,26 @@ public class ArchivePanel : MonoBehaviour
 
         unlocks = UIFactory.Label("Unlocks", window, "", 20, Palette.TextSecondary, FontKind.Body);
         UIFactory.Place(unlocks.rectTransform, Vector2.zero, new Vector2(1f, 0f), new Vector2(40f, 28f), new Vector2(-40f, 70f));
+    }
+
+    void BuildLog(RectTransform window)
+    {
+        logView = UIFactory.Rect("LogView", window);
+        UIFactory.Stretch(logView);
+
+        logList = UIFactory.Rect("Flights", logView);
+        UIFactory.Place(logList, Vector2.zero, new Vector2(0f, 1f), new Vector2(36f, 36f), new Vector2(36f + 500f, -128f));
+        var v = UIFactory.Vertical(logList.gameObject, 0, 0, 0, 0, 8f);
+        v.childAlignment = TextAnchor.UpperLeft;
+
+        var detailCard = UIFactory.Card("Detail", logView, Palette.Blue, false);
+        UIFactory.Place(detailCard, Vector2.zero, Vector2.one, new Vector2(36f + 500f + 24f, 36f), new Vector2(-36f, -128f));
+        logDetail = UIFactory.Label("Analysis", detailCard, "", 21, Palette.TextMain, FontKind.Body, TextAnchor.UpperLeft);
+        UIFactory.Place(logDetail.rectTransform, Vector2.zero, Vector2.one, new Vector2(34f, 20f), new Vector2(-24f, -20f));
+        logDetail.verticalOverflow = VerticalWrapMode.Truncate;
+        logDetail.resizeTextForBestFit = true;
+        logDetail.resizeTextMinSize = 13;
+        logDetail.resizeTextMaxSize = 21;
     }
 
     static Row BuildRow(RectTransform parent, ContractSpec c)
